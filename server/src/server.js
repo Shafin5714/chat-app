@@ -5,11 +5,13 @@ import 'colors';
 dotenv.config();
 import { connectDB } from './config/db.js';
 import routes from './routes/index.js';
+import path from 'path';
 
 const app = express();
 
 // accept json data in body
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 
@@ -19,6 +21,10 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 app.use('/', routes);
+
+// file upload
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '/uploads')));
 
 app.listen(PORT, () => {
   console.log(

@@ -1,43 +1,35 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import { generateToken } from '../utils/generateToken.js';
-import formidable from 'formidable';
-import fs from 'fs';
-import path from 'path';
 
 //  register
 export const registerUser = asyncHandler(async (req, res, next) => {
-  const form = formidable({ multiples: true });
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      next(err);
-      return;
-    }
-
-    files.image[0].originalFilename = Date.now() + files.image.name;
-    const __dirname = path.resolve();
-
-    const newPath = `${__dirname}/uploads`;
-
-    console.log(__dirname);
-    const checkUser = await User.findOne({ email: fields.email });
+  if (req.file) {
+    const checkUser = await User.findOne({ email: req.body.email });
     if (checkUser) {
-      console.log('user already exists');
+      res.status(409);
+      throw new Error('User already exists');
     } else {
-      fs.copyFile(files.image[0].filepath, newPath, async (error) => {
-        if (!error) {
-          const createUser = await User.create({
-            username: fields.username[0],
-            email: fields.email[0],
-            password: fields.password[0],
-          });
-          if (createUser) {
-            console.log('success');
-          }
-        } else {
-          console.log(error);
-        }
+      const user = User.create({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        image: req.file.filename,
       });
+      if (user) {
+        generateToken(user._id);
+        res.status(201).json({
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+        });
+      } else {
+        res.status(400);
+        throw new Error('Invalid user data');
+      }
     }
-  });
+  } else {
+    res.status(400);
+    throw new Error('Profile picture required.');
+  }
 });

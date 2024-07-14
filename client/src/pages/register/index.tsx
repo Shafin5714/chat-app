@@ -3,6 +3,7 @@ import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
 import { UploadOutlined } from '@ant-design/icons';
 import { useRegisterMutation } from '../../store/apis/auth';
+import { useState } from 'react';
 
 type FieldType = {
   username?: string;
@@ -12,33 +13,22 @@ type FieldType = {
   upload: File[];
 };
 
-const normFile = (e: any) => {
-  console.log('Upload event:', e);
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
-};
-
 export default function Register() {
   // apis
   const [registerUser] = useRegisterMutation();
 
+  // state
+  const [file, setFile] = useState<File | null>(null);
+
   const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
     console.log('Success:', values);
-    const { username, email, password, upload } = values;
+    const { username, email, password } = values;
     const formData = new FormData();
     formData.append('username', username ? username : '');
     formData.append('email', email ? email : '');
     formData.append('password', password ? password : '');
-    const image = new File([upload[0]], upload[0].name, {
-      type: upload[0].type,
-    });
 
-    console.log(image);
-    
-
-    formData.append('image', image);
+    formData.append('image', file as File);
 
     registerUser(formData);
   };
@@ -47,6 +37,10 @@ export default function Register() {
     errorInfo,
   ) => {
     console.log('Failed:', errorInfo);
+  };
+
+  const handleImage = (event: any) => {
+    setFile(event.target.files[0]);
   };
 
   return (
@@ -122,15 +116,9 @@ export default function Register() {
             <Input.Password />
           </Form.Item>
           <Form.Item
-            name="upload"
-            label="Upload"
-            valuePropName="fileList"
-            getValueFromEvent={normFile}
             rules={[{ required: true, message: 'Profile picture required' }]}
           >
-            <Upload name="upload" beforeUpload={() => false} listType="picture">
-              <Button icon={<UploadOutlined />}>Click to upload</Button>
-            </Upload>
+            <input type="file" onChange={handleImage} />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
