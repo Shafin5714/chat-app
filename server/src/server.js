@@ -24,7 +24,7 @@ app.use('/', routes);
 
 // file upload
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, '/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.listen(PORT, () => {
   console.log(

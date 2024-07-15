@@ -21,9 +21,16 @@ export const authApi = emptySplitApi.injectEndpoints({
       }),
       transformResponse: (response: { data: Res }) => response.data,
     }),
+    login: builder.mutation<Res, { email: string; password: string }>({
+      query: (credentials) => ({
+        url: '/user/login',
+        method: 'POST',
+        body: credentials,
+      }),
+      transformResponse: (response: { data: Res }) => response.data,
+    }),
   }),
-
   overrideExisting: false,
 });
 
-export const { useRegisterMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation } = authApi;

@@ -1,15 +1,32 @@
 import { Button, Form, Input, Card } from 'antd';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
+import { useLoginMutation } from '@/apis/auth';
 
 type FieldType = {
   email?: string;
   password?: string;
 };
 
-export default function index() {
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+export default function Index() {
+  // hooks
+  const [login, { isLoading }] = useLoginMutation();
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('Success:', values);
+    const { email, password } = values;
+    try {
+      const res = await login({
+        email: email as string,
+        password: password as string,
+      }).unwrap();
+      console.log(res);
+
+      // dispatch(setCredentials({ ...res }));
+      // navigate(redirect);
+    } catch (err) {
+      // toast.error(err?.data?.message || err.error);
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (

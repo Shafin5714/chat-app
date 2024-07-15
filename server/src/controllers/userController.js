@@ -14,7 +14,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         username: req.body.username,
         email: req.body.email,
         password: req.body.password,
-        image: req.file.filename,
+        image: '/uploads/' + req.file.filename,
       });
       if (user) {
         res.status(201).json({
@@ -43,6 +43,7 @@ export const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      image: user.image,
       token: generateToken(user._id),
     });
   } else {

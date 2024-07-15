@@ -12,7 +12,6 @@ import type {
 const baseQuery = fetchBaseQuery({
   //   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   baseUrl: 'http://localhost:5000/api',
-  credentials: 'include',
   prepareHeaders: (headers) => {
     // const token = getLocalStorageItem(LocalStorageName.accessToken);
 
