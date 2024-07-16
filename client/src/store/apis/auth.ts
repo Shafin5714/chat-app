@@ -3,12 +3,11 @@ import { emptySplitApi } from './emptySplitApi';
 type Req = FormData;
 
 type Res = {
-  id: string;
+  _id: string;
+  token: string;
   name: string;
   email: string;
-  status: number;
-  phone: string;
-  token: string;
+  image: string;
 };
 
 export const authApi = emptySplitApi.injectEndpoints({
@@ -27,7 +26,7 @@ export const authApi = emptySplitApi.injectEndpoints({
         method: 'POST',
         body: credentials,
       }),
-      transformResponse: (response: { data: Res }) => response.data,
+      // transformResponse: (response: { data: Res }) => response.data,
     }),
   }),
   overrideExisting: false,

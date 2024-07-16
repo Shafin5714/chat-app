@@ -22,7 +22,7 @@ connectDB();
 
 app.use('/', routes);
 
-// file upload
+// serve static files
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
