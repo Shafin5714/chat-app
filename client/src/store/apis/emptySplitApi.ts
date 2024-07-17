@@ -13,12 +13,14 @@ const baseQuery = fetchBaseQuery({
   //   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   baseUrl: 'http://localhost:5000/api',
   prepareHeaders: (headers) => {
-    // const token = getLocalStorageItem(LocalStorageName.accessToken);
-
-    // if (token) {
-    //   headers.set('Authorization', `Bearer ${token}`);
-    // }
-    return headers;
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') as string);
+    if (userInfo) {
+      const { token } = userInfo;
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    }
   },
 });
 
@@ -50,6 +52,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const emptySplitApi = createApi({
   reducerPath: 'chat-app',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Login'],
+  tagTypes: ['Login', 'Friends'],
   endpoints: () => ({}),
 });

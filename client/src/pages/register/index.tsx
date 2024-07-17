@@ -1,9 +1,11 @@
 import { Button, Form, Input, Card, Upload } from 'antd';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
-import { UploadOutlined } from '@ant-design/icons';
+
 import { useRegisterMutation } from '../../store/apis/auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAppSelector } from '@/store';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 type FieldType = {
   username?: string;
@@ -14,11 +16,21 @@ type FieldType = {
 };
 
 export default function Register() {
+  // hooks
+  const navigate = useNavigate();
+
   // apis
   const [registerUser] = useRegisterMutation();
 
   // state
   const [file, setFile] = useState<File | null>(null);
+  const { userInfo } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate('/');
+    }
+  }, [navigate, userInfo]);
 
   const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
     console.log('Success:', values);

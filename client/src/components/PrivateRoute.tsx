@@ -3,7 +3,6 @@ import { useAppSelector } from '@/store';
 
 const PrivateRoute = () => {
   const { userInfo } = useAppSelector((store) => store.auth);
-  console.log(userInfo);
 
   return userInfo ? <Outlet /> : <Navigate to="/login" replace />;
 };

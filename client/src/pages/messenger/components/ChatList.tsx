@@ -1,11 +1,14 @@
 import { Flex, Space, Avatar, Divider, Input, Card } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
+import { useGetFriendsQuery } from '@/apis/messenger';
 
 export default function ChatList() {
   const { Search } = Input;
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
     console.log(info?.source, value);
+
+  const { data } = useGetFriendsQuery();
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
@@ -22,16 +25,14 @@ export default function ChatList() {
         <Search placeholder="input search text" onSearch={onSearch} />
       </div>
       <Space direction="vertical" style={{ width: '100%' }}>
-        {Array(10)
-          .fill(null)
-          .map((_, index) => (
-            <Card size="small" hoverable>
-              <Space key={index}>
-                <Avatar>S</Avatar>
-                <p>Shafin</p>
-              </Space>
-            </Card>
-          ))}
+        {data?.friends.map(({ image, username, email, _id }) => (
+          <Card size="small" hoverable key={_id}>
+            <Space>
+              <Avatar>S</Avatar>
+              <p>{username}</p>
+            </Space>
+          </Card>
+        ))}
       </Space>
     </Space>
   );
