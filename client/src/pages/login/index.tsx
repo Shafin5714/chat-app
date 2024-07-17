@@ -38,10 +38,8 @@ export default function Index() {
         password: password as string,
       }).unwrap();
 
-      if (res) {
-        dispatch(authSlice.actions.setData({ ...res }));
-        navigate(redirect);
-      }
+      dispatch(authSlice.actions.setData({ ...res }));
+      navigate(redirect);
     } catch (err) {
       // toast.error(err?.data?.message || err.error);
     }
