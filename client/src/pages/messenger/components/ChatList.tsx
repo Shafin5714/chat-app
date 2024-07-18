@@ -25,7 +25,7 @@ export default function ChatList() {
       <div>
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
-            <Avatar>S</Avatar>
+            <Avatar src={`http://localhost:5000${userInfo?.image}`} />
             <p>{userInfo?.name}</p>
           </Space>
           <Button
@@ -46,11 +46,12 @@ export default function ChatList() {
       <div style={{ padding: '10px 15px' }}>
         <Search placeholder="input search text" onSearch={onSearch} />
       </div>
+
       <Space direction="vertical" style={{ width: '100%' }}>
         {data?.friends.map(({ image, username, email, _id }) => (
           <Card size="small" hoverable key={_id}>
             <Space>
-              <Avatar>S</Avatar>
+              <Avatar src={`http://localhost:5000${userInfo?.image}`} />
               <p>{username}</p>
             </Space>
           </Card>

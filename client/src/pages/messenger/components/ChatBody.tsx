@@ -7,7 +7,14 @@ export default function ChatBody() {
     <div style={{ height: '100vh' }}>
       <Flex justify="space-between" align="center" style={{ padding: 10 }}>
         <Space>
-          <Avatar src={<img src={userInfo?.image} alt="avatar" />} />
+          <Avatar
+            src={
+              <img
+                src={`http://localhost:5000${userInfo?.image}`}
+                alt="avatar"
+              />
+            }
+          />
           <p>{userInfo?.name}</p>
         </Space>
       </Flex>
@@ -35,7 +42,11 @@ export default function ChatBody() {
               perferendis. Facilis.
             </Typography>
           </div>
-          <Flex justify="flex-end" align="center">
+          <Flex
+            justify="flex-end"
+            align="center"
+            style={{ margin: '10px 0px' }}
+          >
             <div
               style={{
                 maxWidth: 450,
