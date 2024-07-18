@@ -1,14 +1,14 @@
-import React from 'react';
 import { Flex, Space, Avatar, Divider, Typography, Input, Button } from 'antd';
-import { calc } from 'antd/es/theme/internal';
+import { useAppSelector } from '@/store';
 
 export default function ChatBody() {
+  const { userInfo } = useAppSelector((store) => store.auth);
   return (
     <div style={{ height: '100vh' }}>
       <Flex justify="space-between" align="center" style={{ padding: 10 }}>
         <Space>
-          <Avatar>S</Avatar>
-          <p>Shafin</p>
+          <Avatar src={<img src={userInfo?.image} alt="avatar" />} />
+          <p>{userInfo?.name}</p>
         </Space>
       </Flex>
       <Divider style={{ margin: 0 }} />

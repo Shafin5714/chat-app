@@ -1,8 +1,18 @@
-import { Flex, Space, Avatar, Divider, Input, Card } from 'antd';
+import { Flex, Space, Avatar, Divider, Input, Card, Button } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import { useGetFriendsQuery } from '@/apis/messenger';
+import { LogoutOutlined } from '@ant-design/icons';
+import { useAppSelector, useAppDispatch } from '@/store';
+import { authSlice } from '@/slices';
+import { useNavigate } from 'react-router-dom';
 
 export default function ChatList() {
+  // hooks
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  // state
+  const { userInfo } = useAppSelector((state) => state.auth);
   const { Search } = Input;
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
@@ -16,8 +26,20 @@ export default function ChatList() {
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
             <Avatar>S</Avatar>
-            <p>Shafin</p>
+            <p>{userInfo?.name}</p>
           </Space>
+          <Button
+            shape="circle"
+            icon={
+              <LogoutOutlined
+                style={{ color: 'red' }}
+                onClick={() => {
+                  dispatch(authSlice.actions.logout());
+                  navigate('/login');
+                }}
+              />
+            }
+          />
         </Flex>
         <Divider style={{ margin: 0 }} />
       </div>

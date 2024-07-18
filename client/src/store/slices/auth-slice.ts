@@ -8,7 +8,7 @@ type UserInfo = {
   image: string;
 };
 type AuthState = {
-  userInfo: UserInfo;
+  userInfo: UserInfo | null;
 };
 
 const initialState: AuthState = {
@@ -27,6 +27,11 @@ export const authSlice = createSlice({
       state.userInfo = { ...action.payload };
       // in local-storage
       localStorage.setItem('userInfo', JSON.stringify(action.payload));
+    },
+
+    logout: (state) => {
+      state.userInfo = null;
+      localStorage.clear();
     },
   },
 });

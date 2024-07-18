@@ -11,7 +11,7 @@ export default function Messenger() {
       <Col span={12}>
         <ChatBody />
       </Col>
-      <Col span={6}>col-12</Col>
+      <Col span={6}>Coming Soon</Col>
     </Row>
   );
 }
