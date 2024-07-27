@@ -4,6 +4,8 @@ import type {
   FetchArgs,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query';
+import { authSlice } from '@/slices';
+
 // import {
 //   getLocalStorageItem,
 //   LocalStorageName,
@@ -39,7 +41,7 @@ const baseQueryWithReauth: BaseQueryFn<
     //   // retry the initial query
     //   result = await baseQuery(args, api, extraOptions);
     // } else {
-    //   api.dispatch(loggedOut());
+    api.dispatch(authSlice.actions.logout());
     // }
   }
 
@@ -52,6 +54,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const emptySplitApi = createApi({
   reducerPath: 'chat-app',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Login', 'Friends'],
+  tagTypes: ['Login', 'Friends', 'Message'],
   endpoints: () => ({}),
 });

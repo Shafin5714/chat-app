@@ -1,8 +1,75 @@
-import { Flex, Space, Avatar, Divider, Typography, Input, Button } from 'antd';
 import { useAppSelector } from '@/store';
+import { Flex, Space, Avatar, Divider, Typography, Input, Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { useGetMessageQuery, useSendMessageMutation } from '@/apis/messenger';
+import { skipToken } from '@reduxjs/toolkit/query';
+import { useRef } from 'react';
 
-export default function ChatBody() {
+type Props = {
+  currentFriend: {
+    image: string;
+    username: string;
+    email: string;
+    _id: string;
+  } | null;
+};
+
+type TMRes = {
+  senderId: string;
+  senderName: string;
+  receiverId: string;
+  message: {
+    text: string;
+    image: string;
+  };
+  createdAt: string;
+};
+
+export default function ChatBody({ currentFriend }: Props) {
+  const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
+  const [sendMessage, { isLoading }] = useSendMessageMutation();
+  const { data } = useGetMessageQuery(
+    currentFriend?._id ? currentFriend?._id : skipToken,
+  );
+  const [messages, setMessages] = useState<TMRes[] | []>([]);
+
+  useEffect(() => {
+    setMessages(data?.messages as TMRes[]);
+  }, [data]);
+
+  // scroll to bottom
+  const msgEndRef = useRef<null | HTMLDivElement>(null);
+  const scrollToBottom = () => {
+    msgEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, message]);
+
+  const handleSendMessage = async () => {
+    const newMessage = {
+      senderName: userInfo?.name as string,
+      receiverId: currentFriend?._id as string,
+      message,
+    };
+    const res = await sendMessage(newMessage).unwrap();
+
+    if (res) {
+      const newMessage = {
+        createdAt: res.message.createdAt,
+        message: res.message.message,
+        receiverId: res.message.receiverId,
+        senderName: res.message.senderName,
+        senderId: res.message.senderId,
+      };
+
+      setMessages((prevState) => [...prevState, newMessage]);
+      setMessage('');
+    }
+  };
+
   return (
     <div style={{ height: '100vh' }}>
       <Flex justify="space-between" align="center" style={{ padding: 10 }}>
@@ -10,12 +77,12 @@ export default function ChatBody() {
           <Avatar
             src={
               <img
-                src={`http://localhost:5000${userInfo?.image}`}
+                src={`http://localhost:5000${currentFriend?.image}`}
                 alt="avatar"
               />
             }
           />
-          <p>{userInfo?.name}</p>
+          <p>{currentFriend?.username}</p>
         </Space>
       </Flex>
       <Divider style={{ margin: 0 }} />
@@ -26,49 +93,62 @@ export default function ChatBody() {
         }}
       >
         <div style={{ padding: 10 }}>
-          <div
-            style={{
-              maxWidth: 450,
-              background: '#ececec',
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Typography>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nobis
-              repellat aspernatur, placeat laboriosam, perspiciatis illo,
-              architecto expedita quaerat maiores voluptatem beatae at magni?
-              Possimus necessitatibus beatae exercitationem voluptates
-              perferendis. Facilis.
-            </Typography>
-          </div>
-          <Flex
-            justify="flex-end"
-            align="center"
-            style={{ margin: '10px 0px' }}
-          >
-            <div
-              style={{
-                maxWidth: 450,
-                background: '#579ffb',
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
-              <Typography style={{ color: 'white' }}>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nobis
-                repellat aspernatur, placeat laboriosam, perspiciatis illo,
-                architecto expedita quaerat maiores voluptatem beatae at magni?
-                Possimus necessitatibus beatae exercitationem voluptates
-                perferendis. Facilis.
-              </Typography>
-            </div>
-          </Flex>
+          {messages?.length > 0
+            ? messages.map((m, index) =>
+                m.senderId === userInfo?._id ? (
+                  <Flex
+                    justify="flex-end"
+                    align="center"
+                    key={index}
+                    style={{ margin: '10px 0px' }}
+                    ref={msgEndRef}
+                  >
+                    <div
+                      style={{
+                        maxWidth: 450,
+                      }}
+                    >
+                      <Typography
+                        style={{
+                          color: 'white',
+                          background: '#579ffb',
+                          padding: 10,
+                          borderRadius: 10,
+                        }}
+                      >
+                        {m.message.text}
+                      </Typography>
+                    </div>
+                  </Flex>
+                ) : (
+                  <Flex
+                    style={{
+                      maxWidth: 450,
+                      margin: '10px 0px',
+                    }}
+                    key={index}
+                    ref={msgEndRef}
+                  >
+                    <Typography
+                      style={{
+                        background: '#ececec',
+                        padding: 10,
+                        borderRadius: 10,
+                      }}
+                    >
+                      {m.message.text}
+                    </Typography>
+                  </Flex>
+                ),
+              )
+            : null}
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
-        <Input />
-        <Button type="primary">Send</Button>
+        <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+        <Button type="primary" onClick={handleSendMessage}>
+          Send
+        </Button>
       </Space.Compact>
     </div>
   );

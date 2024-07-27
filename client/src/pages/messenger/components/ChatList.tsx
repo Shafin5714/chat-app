@@ -1,12 +1,25 @@
 import { Flex, Space, Avatar, Divider, Input, Card, Button } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
-import { useGetFriendsQuery } from '@/apis/messenger';
+import messengerApi, { useGetFriendsQuery } from '@/apis/messenger';
 import { LogoutOutlined } from '@ant-design/icons';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { authSlice } from '@/slices';
 import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 
-export default function ChatList() {
+type TFriend = {
+  image: string;
+  username: string;
+  email: string;
+  _id: string;
+};
+
+type Props = {
+  setCurrentFriend: React.Dispatch<React.SetStateAction<TFriend | null>>;
+  currentFriend: TFriend | null;
+};
+
+export default function ChatList({ setCurrentFriend, currentFriend }: Props) {
   // hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -19,6 +32,21 @@ export default function ChatList() {
     console.log(info?.source, value);
 
   const { data } = useGetFriendsQuery();
+
+  useEffect(() => {
+    if (data?.friends.length) {
+      setCurrentFriend(data?.friends[0]);
+    }
+  }, [data]);
+
+  const activeStyle = {
+    background: '#13c2c2',
+    color: 'white',
+  };
+  const inactiveStyle = {
+    background: 'white',
+    color: 'black',
+  };
 
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
@@ -35,6 +63,7 @@ export default function ChatList() {
                 style={{ color: 'red' }}
                 onClick={() => {
                   dispatch(authSlice.actions.logout());
+                  dispatch(messengerApi.util.resetApiState());
                   navigate('/login');
                 }}
               />
@@ -48,11 +77,19 @@ export default function ChatList() {
       </div>
 
       <Space direction="vertical" style={{ width: '100%' }}>
-        {data?.friends.map(({ image, username, email, _id }) => (
-          <Card size="small" hoverable key={_id}>
+        {data?.friends.map((friend) => (
+          <Card
+            size="small"
+            hoverable
+            key={friend._id}
+            onClick={() => setCurrentFriend(friend)}
+            style={
+              friend._id === currentFriend?._id ? activeStyle : inactiveStyle
+            }
+          >
             <Space>
-              <Avatar src={`http://localhost:5000${userInfo?.image}`} />
-              <p>{username}</p>
+              <Avatar src={`http://localhost:5000${friend.image}`} />
+              <p>{friend.username}</p>
             </Space>
           </Card>
         ))}
