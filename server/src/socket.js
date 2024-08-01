@@ -53,6 +53,17 @@ const setUpSocket = (server) => {
         });
       }
     });
+
+    socket.on('typingMessage', (data) => {
+      const user = users.find((user) => user.userId === data.receiverId);
+      if (user) {
+        socket.to(user.socketId).emit('typingMessageGet', {
+          senderId: data.senderId,
+          receiverId: data.receiverId,
+          isTyping: data.isTyping,
+        });
+      }
+    });
   });
 };
 

@@ -35,6 +35,7 @@ export default function ChatBody({ currentFriend }: Props) {
     currentFriend?._id ? currentFriend?._id : skipToken,
   );
   const [messages, setMessages] = useState<TMRes[] | []>([]);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   useEffect(() => {
     setMessages(data?.messages as TMRes[]);
@@ -44,7 +45,20 @@ export default function ChatBody({ currentFriend }: Props) {
     socket.on('getMessage', (data) => {
       setSocketMessage(data as TMRes);
     });
-  }, []);
+
+    socket.on('typingMessageGet', (data) => {
+      if (currentFriend?._id) {
+        if (
+          data.senderId === currentFriend?._id &&
+          data.receiverId === userInfo?._id
+        ) {
+          setIsTyping(data.isTyping);
+        } else {
+          setIsTyping(false);
+        }
+      }
+    });
+  }, [currentFriend?._id, userInfo?._id]);
 
   useEffect(() => {
     if (socketMessage && currentFriend) {
@@ -55,7 +69,17 @@ export default function ChatBody({ currentFriend }: Props) {
         setMessages([...messages, socketMessage as TMRes]);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketMessage]);
+
+  useEffect(() => {
+    socket.emit('typingMessage', {
+      senderId: userInfo?._id,
+      receiverId: currentFriend?._id,
+      isTyping: message.length > 0 ? true : false,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 
   // scroll to bottom
   const msgEndRef = useRef<null | HTMLDivElement>(null);
@@ -99,6 +123,12 @@ export default function ChatBody({ currentFriend }: Props) {
       setMessage('');
     }
   };
+
+  const handleInput = (value: string) => {
+    setMessage(value);
+  };
+
+  console.log(isTyping);
 
   return (
     <div style={{ height: '100vh' }}>
@@ -172,11 +202,29 @@ export default function ChatBody({ currentFriend }: Props) {
                 ),
               )
             : null}
+          {isTyping && (
+            <Flex
+              justify="flex-end"
+              align="center"
+              style={{ margin: '10px 0px' }}
+            >
+              <Typography
+                style={{
+                  color: 'white',
+                  background: '#579ffb',
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                Typing...
+              </Typography>
+            </Flex>
+          )}
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
-        <Input value={message} onChange={(e) => setMessage(e.target.value)} />
-        <Button type="primary" onClick={handleSendMessage}>
+        <Input value={message} onChange={(e) => handleInput(e.target.value)} />
+        <Button type="primary" onClick={handleSendMessage} loading={isLoading}>
           Send
         </Button>
       </Space.Compact>
