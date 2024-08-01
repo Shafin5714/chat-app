@@ -1,4 +1,4 @@
-import { Flex, Space, Avatar, Divider, Input, Card, Button } from 'antd';
+import { Flex, Space, Avatar, Divider, Input, Card, Button, Badge } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import messengerApi, { useGetFriendsQuery } from '@/apis/messenger';
 import { LogoutOutlined } from '@ant-design/icons';
@@ -17,9 +17,14 @@ type TFriend = {
 type Props = {
   setCurrentFriend: React.Dispatch<React.SetStateAction<TFriend | null>>;
   currentFriend: TFriend | null;
+  activeIds: string[];
 };
 
-export default function ChatList({ setCurrentFriend, currentFriend }: Props) {
+export default function ChatList({
+  setCurrentFriend,
+  currentFriend,
+  activeIds,
+}: Props) {
   // hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -54,6 +59,7 @@ export default function ChatList({ setCurrentFriend, currentFriend }: Props) {
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
             <Avatar src={`http://localhost:5000${userInfo?.image}`} />
+
             <p>{userInfo?.name}</p>
           </Space>
           <Button
@@ -88,7 +94,10 @@ export default function ChatList({ setCurrentFriend, currentFriend }: Props) {
             }
           >
             <Space>
-              <Avatar src={`http://localhost:5000${friend.image}`} />
+              <Badge dot={activeIds.includes(friend._id)} status="success">
+                <Avatar src={`http://localhost:5000${friend.image}`} />
+              </Badge>
+
               <p>{friend.username}</p>
             </Space>
           </Card>

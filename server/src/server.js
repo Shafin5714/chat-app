@@ -6,6 +6,7 @@ dotenv.config();
 import { connectDB } from './config/db.js';
 import routes from './routes/index.js';
 import path from 'path';
+import setupSocket from './socket.js';
 
 const app = express();
 
@@ -26,9 +27,12 @@ app.use('/', routes);
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(
     `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow
       .bold,
   );
 });
+
+//socket
+setupSocket(server);

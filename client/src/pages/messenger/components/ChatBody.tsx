@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useGetMessageQuery, useSendMessageMutation } from '@/apis/messenger';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
+import { socket } from '../../../socket';
 
 type Props = {
   currentFriend: {
@@ -29,6 +30,7 @@ export default function ChatBody({ currentFriend }: Props) {
   const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
+  const [socketMessage, setSocketMessage] = useState<TMRes | null>(null);
   const { data } = useGetMessageQuery(
     currentFriend?._id ? currentFriend?._id : skipToken,
   );
@@ -37,6 +39,23 @@ export default function ChatBody({ currentFriend }: Props) {
   useEffect(() => {
     setMessages(data?.messages as TMRes[]);
   }, [data]);
+
+  useEffect(() => {
+    socket.on('getMessage', (data) => {
+      setSocketMessage(data as TMRes);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (socketMessage && currentFriend) {
+      if (
+        socketMessage?.senderId === currentFriend?._id &&
+        socketMessage.receiverId === userInfo?._id
+      ) {
+        setMessages([...messages, socketMessage as TMRes]);
+      }
+    }
+  }, [socketMessage]);
 
   // scroll to bottom
   const msgEndRef = useRef<null | HTMLDivElement>(null);
@@ -55,6 +74,17 @@ export default function ChatBody({ currentFriend }: Props) {
       message,
     };
     const res = await sendMessage(newMessage).unwrap();
+
+    socket.emit('sendMessage', {
+      senderName: userInfo?.name as string,
+      senderId: userInfo?._id as string,
+      receiverId: currentFriend?._id as string,
+      message: {
+        text: message,
+        image: '',
+      },
+      time: new Date(),
+    });
 
     if (res) {
       const newMessage = {
