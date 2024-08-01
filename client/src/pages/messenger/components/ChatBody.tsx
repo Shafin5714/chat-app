@@ -36,6 +36,13 @@ export default function ChatBody({ currentFriend }: Props) {
   );
   const [messages, setMessages] = useState<TMRes[] | []>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [socketTypingData, setSocketTypingData] = useState<{
+    senderId: string;
+    isTyping: boolean;
+  }>({
+    senderId: '',
+    isTyping: false,
+  });
 
   useEffect(() => {
     setMessages(data?.messages as TMRes[]);
@@ -45,20 +52,22 @@ export default function ChatBody({ currentFriend }: Props) {
     socket.on('getMessage', (data) => {
       setSocketMessage(data as TMRes);
     });
-
     socket.on('typingMessageGet', (data) => {
-      if (currentFriend?._id) {
-        if (
-          data.senderId === currentFriend?._id &&
-          data.receiverId === userInfo?._id
-        ) {
-          setIsTyping(data.isTyping);
-        } else {
-          setIsTyping(false);
-        }
-      }
+      setSocketTypingData((prevState) => ({
+        ...prevState,
+        senderId: data.senderId,
+        isTyping: data.isTyping,
+      }));
     });
-  }, [currentFriend?._id, userInfo?._id]);
+  }, []);
+
+  useEffect(() => {
+    if (socketTypingData.senderId === currentFriend?._id) {
+      setIsTyping(socketTypingData.isTyping);
+    } else {
+      setIsTyping(false);
+    }
+  }, [currentFriend?._id, socketTypingData]);
 
   useEffect(() => {
     if (socketMessage && currentFriend) {
@@ -127,8 +136,6 @@ export default function ChatBody({ currentFriend }: Props) {
   const handleInput = (value: string) => {
     setMessage(value);
   };
-
-  console.log(isTyping);
 
   return (
     <div style={{ height: '100vh' }}>
@@ -202,11 +209,12 @@ export default function ChatBody({ currentFriend }: Props) {
                 ),
               )
             : null}
-          {isTyping && (
+          {isTyping ? (
             <Flex
               justify="flex-end"
               align="center"
               style={{ margin: '10px 0px' }}
+              ref={msgEndRef}
             >
               <Typography
                 style={{
@@ -219,7 +227,7 @@ export default function ChatBody({ currentFriend }: Props) {
                 Typing...
               </Typography>
             </Flex>
-          )}
+          ) : null}
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
