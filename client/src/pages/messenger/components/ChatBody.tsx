@@ -98,7 +98,7 @@ export default function ChatBody({ currentFriend }: Props) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, message]);
+  }, [messages, message, socketTypingData]);
 
   const handleSendMessage = async () => {
     const newMessage = {
