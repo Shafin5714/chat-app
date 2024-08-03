@@ -56,3 +56,37 @@ export const getMessage = asyncHandler(async (req, res) => {
     messages: getMessages,
   });
 });
+
+export const sendImage = asyncHandler(async (req, res) => {
+  if (req.file) {
+    const { senderName, receiverId } = req.body;
+
+    const insertMessage = await Message.create({
+      senderId: req.user._id,
+      senderName,
+      receiverId,
+      message: {
+        text: '',
+        image: '/uploads/' + req.file.filename,
+      },
+    });
+    if (insertMessage) {
+      res.status(201).json({
+        success: true,
+        message: {
+          senderId: req.user._id,
+          senderName,
+          receiverId,
+          message: {
+            text: '',
+            image: '/uploads/' + req.file.filename,
+          },
+          createdAt: insertMessage.createdAt,
+        },
+      });
+    }
+  } else {
+    res.status(400);
+    throw new Error('Image required.');
+  }
+});

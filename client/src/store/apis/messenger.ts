@@ -55,6 +55,29 @@ export const messengerApi = emptySplitApi.injectEndpoints({
       query: (id) => ({ url: `/messenger/message/${id}` }),
       providesTags: ['Message'],
     }),
+    sendImage: builder.mutation<
+      {
+        success: true;
+        message: {
+          senderId: string;
+          senderName: string;
+          receiverId: string;
+          message: {
+            text: string;
+            image: string;
+          };
+          createdAt: string;
+        };
+      },
+      FormData
+    >({
+      query: (data) => ({
+        url: '/messenger/send-image',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Message'],
+    }),
   }),
 });
 
@@ -62,6 +85,7 @@ export const {
   useGetFriendsQuery,
   useSendMessageMutation,
   useGetMessageQuery,
+  useSendImageMutation,
 } = messengerApi;
 
 export default messengerApi;

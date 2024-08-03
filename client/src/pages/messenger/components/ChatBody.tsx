@@ -1,7 +1,11 @@
 import { useAppSelector } from '@/store';
 import { Flex, Space, Avatar, Divider, Typography, Input, Button } from 'antd';
 import { useEffect, useState } from 'react';
-import { useGetMessageQuery, useSendMessageMutation } from '@/apis/messenger';
+import {
+  useGetMessageQuery,
+  useSendMessageMutation,
+  useSendImageMutation,
+} from '@/apis/messenger';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
 import { socket } from '../../../socket';
@@ -30,6 +34,7 @@ export default function ChatBody({ currentFriend }: Props) {
   const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
+  const [sendImage, { isLoading: sendImageLoading }] = useSendImageMutation();
   const [socketMessage, setSocketMessage] = useState<TMRes | null>(null);
   const { data } = useGetMessageQuery(
     currentFriend?._id ? currentFriend?._id : skipToken,
@@ -43,6 +48,7 @@ export default function ChatBody({ currentFriend }: Props) {
     senderId: '',
     isTyping: false,
   });
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     setMessages(data?.messages as TMRes[]);
@@ -137,6 +143,36 @@ export default function ChatBody({ currentFriend }: Props) {
     setMessage(value);
   };
 
+  const handleImage = async (e: any) => {
+    const formData = new FormData();
+    formData.append('senderName', userInfo?.name as string);
+    formData.append('senderId', userInfo?._id as string);
+    formData.append('receiverId', currentFriend?._id as string);
+    formData.append('image', e.target.files[0]);
+    const res = await sendImage(formData).unwrap();
+    const newMessage = {
+      createdAt: res.message.createdAt,
+      message: res.message.message,
+      receiverId: res.message.receiverId,
+      senderName: res.message.senderName,
+      senderId: res.message.senderId,
+    };
+
+    socket.emit('sendMessage', {
+      senderName: userInfo?.name as string,
+      senderId: userInfo?._id as string,
+      receiverId: currentFriend?._id as string,
+      message: {
+        text: '',
+        image: res.message.message.image,
+      },
+      time: new Date(),
+    });
+
+    setMessages((prevState) => [...prevState, newMessage]);
+    setMessage('');
+  };
+
   return (
     <div style={{ height: '100vh' }}>
       <Flex justify="space-between" align="center" style={{ padding: 10 }}>
@@ -175,16 +211,33 @@ export default function ChatBody({ currentFriend }: Props) {
                         maxWidth: 450,
                       }}
                     >
-                      <Typography
-                        style={{
-                          color: 'white',
-                          background: '#579ffb',
-                          padding: 10,
-                          borderRadius: 10,
-                        }}
-                      >
-                        {m.message.text}
-                      </Typography>
+                      {m.message.text ? (
+                        <Typography
+                          style={{
+                            color: 'white',
+                            background: '#579ffb',
+                            padding: 10,
+                            borderRadius: 10,
+                          }}
+                        >
+                          {m.message.text}
+                        </Typography>
+                      ) : (
+                        <div
+                          style={{
+                            padding: 10,
+                            border: '1px solid gray',
+                            borderRadius: 5,
+                          }}
+                          ref={msgEndRef}
+                        >
+                          <img
+                            src={`http://localhost:5000${m.message.image}`}
+                            alt=""
+                            width={300}
+                          />
+                        </div>
+                      )}
                     </div>
                   </Flex>
                 ) : (
@@ -196,15 +249,32 @@ export default function ChatBody({ currentFriend }: Props) {
                     key={index}
                     ref={msgEndRef}
                   >
-                    <Typography
-                      style={{
-                        background: '#ececec',
-                        padding: 10,
-                        borderRadius: 10,
-                      }}
-                    >
-                      {m.message.text}
-                    </Typography>
+                    {m.message.text ? (
+                      <Typography
+                        style={{
+                          background: '#ececec',
+                          padding: 10,
+                          borderRadius: 10,
+                        }}
+                      >
+                        {m.message.text}
+                      </Typography>
+                    ) : (
+                      <div
+                        style={{
+                          padding: 10,
+                          border: '1px solid gray',
+                          borderRadius: 5,
+                        }}
+                        ref={msgEndRef}
+                      >
+                        <img
+                          src={`http://localhost:5000${m.message.image}`}
+                          alt=""
+                          width={300}
+                        />
+                      </div>
+                    )}
                   </Flex>
                 ),
               )
@@ -231,6 +301,12 @@ export default function ChatBody({ currentFriend }: Props) {
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
+        <input
+          type="file"
+          multiple={false}
+          onChange={handleImage}
+          style={{ width: 150 }}
+        />
         <Input value={message} onChange={(e) => handleInput(e.target.value)} />
         <Button type="primary" onClick={handleSendMessage} loading={isLoading}>
           Send
