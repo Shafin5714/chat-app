@@ -17,6 +17,7 @@ type Props = {
     email: string;
     _id: string;
   } | null;
+  setSharedImages: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 type TMRes = {
@@ -30,7 +31,7 @@ type TMRes = {
   createdAt: string;
 };
 
-export default function ChatBody({ currentFriend }: Props) {
+export default function ChatBody({ currentFriend, setSharedImages }: Props) {
   const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
@@ -105,6 +106,12 @@ export default function ChatBody({ currentFriend }: Props) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, message, socketTypingData]);
+
+  useEffect(() => {
+    if (messages?.length) {
+      setSharedImages(messages.map((message) => message.message.image));
+    }
+  }, [messages]);
 
   const handleSendMessage = async () => {
     const newMessage = {

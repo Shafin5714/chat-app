@@ -1,8 +1,8 @@
 import { Col, Row } from 'antd';
 import ChatList from './components/ChatList';
 import ChatBody from './components/ChatBody';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import SharedMedia from './components/SharedMedia';
+import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
 import { socket } from '../../socket';
 
@@ -22,6 +22,7 @@ export default function Messenger() {
   const [activeUsers, setActiveUsers] = useState<
     { userId: string; socketId: string; userInfo: TFriend }[]
   >([]);
+  const [sharedImages, setSharedImages] = useState<string[]>([]);
 
   // effects
   useEffect(() => {
@@ -45,9 +46,14 @@ export default function Messenger() {
         />
       </Col>
       <Col span={12}>
-        <ChatBody currentFriend={currentFriend} />
+        <ChatBody
+          currentFriend={currentFriend}
+          setSharedImages={setSharedImages}
+        />
       </Col>
-      <Col span={6}>Coming Soon</Col>
+      <Col span={6}>
+        <SharedMedia sharedImages={sharedImages} />
+      </Col>
     </Row>
   );
 }
