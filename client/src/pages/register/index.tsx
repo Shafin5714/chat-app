@@ -1,4 +1,4 @@
-import { Button, Form, Input, Card, Upload } from 'antd';
+import { Button, Form, Input, Card, Upload, Flex } from 'antd';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
 
@@ -6,13 +6,17 @@ import { useRegisterMutation } from '../../store/apis/auth';
 import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import type { GetProp, UploadFile, UploadProps } from 'antd';
+import ImgCrop from 'antd-img-crop';
+
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 type FieldType = {
   username?: string;
   email?: string;
   password?: string;
   confirm?: string;
-  upload: File[];
+  upload: UploadFile[];
 };
 
 export default function Register() {
@@ -25,6 +29,7 @@ export default function Register() {
   // state
   const [file, setFile] = useState<File | null>(null);
   const { userInfo } = useAppSelector((state) => state.auth);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
     if (userInfo) {
@@ -41,6 +46,7 @@ export default function Register() {
     formData.append('password', password ? password : '');
 
     formData.append('image', file as File);
+    // formData.append('image', fileList[0].originFileObj as File);
 
     registerUser(formData);
   };
@@ -51,8 +57,42 @@ export default function Register() {
     console.log('Failed:', errorInfo);
   };
 
-  const handleImage = (event: any) => {
-    setFile(event.target.files[0]);
+  // const handleImage = (event: any) => {
+  //   setFile(event.target.files[0]);
+  // };
+
+  const props: UploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
+      setFile(file);
+      return false;
+    },
+    fileList,
+  };
+
+  const onPreview = async (file: UploadFile) => {
+    let src = file.url as string;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj as FileType);
+        reader.onload = () => resolve(reader.result as string);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
+
+  const onChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
   };
 
   return (
@@ -62,7 +102,7 @@ export default function Register() {
           name="basic"
           labelCol={{ span: 10 }}
           wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
+          style={{ maxWidth: 700 }}
           initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
@@ -127,13 +167,26 @@ export default function Register() {
           >
             <Input.Password />
           </Form.Item>
-          <Form.Item
-            rules={[{ required: true, message: 'Profile picture required' }]}
-          >
-            <input type="file" onChange={handleImage} />
-          </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Flex justify="flex-end">
+            <ImgCrop rotationSlider>
+              <Upload
+                listType="picture-card"
+                {...props}
+                fileList={fileList}
+                onPreview={onPreview}
+                maxCount={1}
+                onChange={onChange}
+              >
+                {fileList.length < 5 && '+ Upload'}
+              </Upload>
+            </ImgCrop>
+          </Flex>
+
+          <Form.Item
+            wrapperCol={{ offset: 8, span: 16 }}
+            style={{ marginTop: 20 }}
+          >
             <Button type="primary" htmlType="submit" style={{ marginTop: 10 }}>
               Submit
             </Button>
