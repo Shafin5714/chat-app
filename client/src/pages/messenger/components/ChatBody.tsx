@@ -1,5 +1,14 @@
 import { useAppSelector } from '@/store';
-import { Flex, Space, Avatar, Divider, Typography, Input, Button } from 'antd';
+import {
+  Flex,
+  Space,
+  Avatar,
+  Divider,
+  Typography,
+  Input,
+  Button,
+  Upload,
+} from 'antd';
 import { useEffect, useState } from 'react';
 import {
   useGetMessageQuery,
@@ -9,6 +18,7 @@ import {
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
 import { socket } from '../../../socket';
+import { FileImageOutlined } from '@ant-design/icons';
 
 type Props = {
   currentFriend: {
@@ -308,12 +318,17 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
-        <input
-          type="file"
-          multiple={false}
-          onChange={handleImage}
-          style={{ width: 150 }}
-        />
+        <Button icon={<FileImageOutlined />}>
+          <label htmlFor="file">Choose File</label>
+          <input
+            id="file"
+            type="file"
+            onChange={handleImage}
+            style={{ display: 'none' }}
+            hidden
+          />
+        </Button>
+
         <Input value={message} onChange={(e) => handleInput(e.target.value)} />
         <Button type="primary" onClick={handleSendMessage} loading={isLoading}>
           Send
