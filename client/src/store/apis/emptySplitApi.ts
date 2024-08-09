@@ -6,11 +6,6 @@ import type {
 } from '@reduxjs/toolkit/query';
 import { authSlice } from '@/slices';
 
-// import {
-//   getLocalStorageItem,
-//   LocalStorageName,
-// } from '@/services/local-storage';
-
 const baseQuery = fetchBaseQuery({
   //   baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
   baseUrl: 'http://localhost:5000/api',
@@ -33,16 +28,7 @@ const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    // try to get a new token
-    // const refreshResult = await baseQuery('/refreshToken', api, extraOptions);
-    // if (refreshResult.data) {
-    //   // store the new token
-    //   api.dispatch(tokenReceived(refreshResult.data));
-    //   // retry the initial query
-    //   result = await baseQuery(args, api, extraOptions);
-    // } else {
     api.dispatch(authSlice.actions.logout());
-    // }
   }
 
   if (result.error) {

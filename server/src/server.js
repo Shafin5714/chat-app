@@ -7,6 +7,7 @@ import { connectDB } from './config/db.js';
 import routes from './routes/index.js';
 import path from 'path';
 import setupSocket from './socket.js';
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 
 const app = express();
 
@@ -26,6 +27,9 @@ app.use('/', routes);
 // serve static files
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
+app.use(notFound);
+app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
   console.log(
