@@ -3,12 +3,8 @@ import User from '../models/userModel.js';
 import Message from '../models/messageModel.js';
 
 export const getFriends = asyncHandler(async (req, res) => {
-  const userList = await User.find({}).select('-password');
-
-  const filteredList = userList.filter(
-    (user) => user.id !== req.user._id.toString(),
-  );
-  res.status(200).json({ friends: filteredList });
+  const friends = await User.find({ _id: { $ne: req.user.id } });
+  res.status(200).json({ friends });
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -41,15 +37,33 @@ export const sendMessage = asyncHandler(async (req, res) => {
 });
 
 export const getMessage = asyncHandler(async (req, res) => {
-  const senderId = req.user._id;
-  const receiverId = req.params.id;
-  const getMessages = (await Message.find({})).filter(
-    (message) =>
-      (message.senderId.toString() === senderId.toString() &&
-        message.receiverId.toString() === receiverId.toString()) ||
-      (message.senderId.toString() === receiverId.toString() &&
-        message.receiverId.toString() === senderId.toString()),
-  );
+  const userId = req.user._id;
+  const friendId = req.params.id;
+
+  const getMessages = await Message.find({
+    $or: [
+      {
+        $and: [
+          { senderId: { $eq: userId } },
+          { receiverId: { $eq: friendId } },
+        ],
+      },
+      {
+        $and: [
+          { senderId: { $eq: friendId } },
+          { receiverId: { $eq: userId } },
+        ],
+      },
+    ],
+  });
+
+  // const getMessages = (await Message.find({})).filter(
+  //   (message) =>
+  //     (message.senderId.toString() === senderId.toString() &&
+  //       message.receiverId.toString() === receiverId.toString()) ||
+  //     (message.senderId.toString() === receiverId.toString() &&
+  //       message.receiverId.toString() === senderId.toString()),
+  // );
 
   res.status(200).json({
     success: true,
