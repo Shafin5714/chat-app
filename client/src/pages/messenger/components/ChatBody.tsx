@@ -344,18 +344,12 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
               )
             : null}
           {isTyping ? (
-            <Flex
-              justify="flex-end"
-              align="center"
-              style={{ margin: '10px 0px' }}
-              ref={msgEndRef}
-            >
+            <Flex align="center" style={{ margin: '10px 0px' }} ref={msgEndRef}>
               <Typography
                 style={{
-                  color: 'white',
-                  background: '#579ffb',
                   padding: 10,
                   borderRadius: 10,
+                  background: '#ececec',
                 }}
               >
                 Typing...
