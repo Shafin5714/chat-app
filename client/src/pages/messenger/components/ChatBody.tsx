@@ -8,6 +8,7 @@ import {
   Input,
   Button,
   Upload,
+  notification,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import {
@@ -95,6 +96,16 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
       ) {
         setMessages([...messages, socketMessage as TMRes]);
       }
+
+      // notification
+      if (
+        socketMessage?.senderId !== currentFriend?._id &&
+        socketMessage.receiverId === userInfo?._id
+      ) {
+        notification.open({
+          message: `${socketMessage?.senderName} send you a message`,
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socketMessage]);
@@ -105,6 +116,7 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
       receiverId: currentFriend?._id,
       isTyping: message.length > 0 ? true : false,
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
