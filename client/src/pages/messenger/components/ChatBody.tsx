@@ -19,6 +19,7 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
 import { socket } from '../../../socket';
 import { FileImageOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 type Props = {
   currentFriend: {
@@ -229,36 +230,52 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
                       }}
                     >
                       {m.message.text ? (
-                        <Typography
-                          style={{
-                            color: 'white',
-                            background: '#579ffb',
-                            padding: 10,
-                            borderRadius: 10,
-                          }}
-                        >
-                          {m.message.text}
-                        </Typography>
+                        <>
+                          <Flex justify="flex-end">
+                            <Typography
+                              style={{
+                                color: 'white',
+                                background: '#579ffb',
+                                padding: 10,
+                                borderRadius: 10,
+                              }}
+                            >
+                              {m.message.text}
+                            </Typography>
+                          </Flex>
+                          <Flex justify="flex-end">
+                            <Typography style={{ fontSize: 10 }}>
+                              {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                            </Typography>
+                          </Flex>
+                        </>
                       ) : (
-                        <div
-                          style={{
-                            padding: 10,
-                            border: '1px solid gray',
-                            borderRadius: 5,
-                          }}
-                          ref={msgEndRef}
-                        >
-                          <img
-                            src={`http://localhost:5000${m.message.image}`}
-                            alt=""
-                            width={300}
-                          />
+                        <div>
+                          <div
+                            style={{
+                              padding: 10,
+                              border: '1px solid gray',
+                              borderRadius: 5,
+                            }}
+                            ref={msgEndRef}
+                          >
+                            <img
+                              src={`http://localhost:5000${m.message.image}`}
+                              alt=""
+                              width={300}
+                            />
+                          </div>
+                          <Flex justify="flex-end">
+                            <Typography style={{ fontSize: 10 }}>
+                              {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                            </Typography>
+                          </Flex>
                         </div>
                       )}
                     </div>
                   </Flex>
                 ) : (
-                  <Flex
+                  <div
                     style={{
                       maxWidth: 450,
                       margin: '10px 0px',
@@ -267,32 +284,50 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
                     ref={msgEndRef}
                   >
                     {m.message.text ? (
-                      <Typography
-                        style={{
-                          background: '#ececec',
-                          padding: 10,
-                          borderRadius: 10,
-                        }}
-                      >
-                        {m.message.text}
-                      </Typography>
+                      <>
+                        <Flex>
+                          <Typography
+                            style={{
+                              background: '#ececec',
+                              padding: 10,
+                              borderRadius: 10,
+                            }}
+                          >
+                            {m.message.text}
+                          </Typography>
+                        </Flex>
+
+                        <Flex justify="flex-start">
+                          <Typography style={{ fontSize: 10 }}>
+                            {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                          </Typography>
+                        </Flex>
+                      </>
                     ) : (
-                      <div
-                        style={{
-                          padding: 10,
-                          border: '1px solid gray',
-                          borderRadius: 5,
-                        }}
-                        ref={msgEndRef}
-                      >
-                        <img
-                          src={`http://localhost:5000${m.message.image}`}
-                          alt=""
-                          width={300}
-                        />
-                      </div>
+                      <>
+                        <Flex ref={msgEndRef}>
+                          <div
+                            style={{
+                              padding: 10,
+                              border: '1px solid gray',
+                              borderRadius: 5,
+                            }}
+                          >
+                            <img
+                              src={`http://localhost:5000${m.message.image}`}
+                              alt=""
+                              width={300}
+                            />
+                          </div>
+                        </Flex>
+                        <Flex justify="flex-start">
+                          <Typography style={{ fontSize: 10 }}>
+                            {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                          </Typography>
+                        </Flex>
+                      </>
                     )}
-                  </Flex>
+                  </div>
                 ),
               )
             : null}
