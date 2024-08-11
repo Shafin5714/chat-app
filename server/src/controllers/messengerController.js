@@ -2,8 +2,39 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import Message from '../models/messageModel.js';
 
+const getLastMessage = async (userId, friendId) => {
+  const message = await Message.findOne({
+    $or: [
+      {
+        $and: [
+          { senderId: { $eq: userId } },
+          { receiverId: { $eq: friendId } },
+        ],
+      },
+      {
+        $and: [
+          { senderId: { $eq: friendId } },
+          { receiverId: { $eq: userId } },
+        ],
+      },
+    ],
+  }).sort({ updatedAt: -1 });
+
+  return message;
+};
+
 export const getFriends = asyncHandler(async (req, res) => {
-  const friends = await User.find({ _id: { $ne: req.user.id } });
+  const data = await User.find({ _id: { $ne: req.user.id } });
+
+  const friends = await Promise.all(
+    data.map(async (friend) => {
+      return {
+        friend,
+        lastMessage: await getLastMessage(req.user._id, friend._id),
+      };
+    }),
+  );
+
   res.status(200).json({ friends });
 });
 

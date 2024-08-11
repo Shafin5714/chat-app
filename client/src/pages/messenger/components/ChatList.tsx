@@ -40,7 +40,7 @@ export default function ChatList({
 
   useEffect(() => {
     if (data?.friends.length) {
-      setCurrentFriend(data?.friends[0]);
+      setCurrentFriend(data?.friends[0].friend);
     }
   }, [data]);
 
@@ -83,7 +83,7 @@ export default function ChatList({
       </div>
 
       <Space direction="vertical" style={{ width: '100%' }}>
-        {data?.friends.map((friend) => (
+        {data?.friends.map(({ friend, lastMessage }) => (
           <Card
             size="small"
             hoverable
@@ -93,12 +93,21 @@ export default function ChatList({
               friend._id === currentFriend?._id ? activeStyle : inactiveStyle
             }
           >
-            <Space>
+            <Space size="middle">
               <Badge dot={activeIds.includes(friend._id)} status="success">
                 <Avatar src={`http://localhost:5000${friend.image}`} />
               </Badge>
-
-              <p>{friend.username}</p>
+              <Space direction="vertical" size={2}>
+                <p style={{ fontSize: 15 }}>{friend.username}</p>
+                <p style={{ fontSize: 12, color: 'gray' }}>
+                  {lastMessage.senderId === userInfo?._id ? 'You: ' : ''}
+                  {lastMessage.message.text
+                    ? `${lastMessage.message.text.slice(0, 10)}${
+                        lastMessage.message.text.length > 10 ? '...' : ''
+                      }`
+                    : ' Sent an image'}
+                </p>
+              </Space>
             </Space>
           </Card>
         ))}

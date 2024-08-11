@@ -2,10 +2,22 @@ import { emptySplitApi } from './emptySplitApi';
 
 type Res = {
   friends: {
-    _id: string;
-    username: string;
-    email: string;
-    image: string;
+    friend: {
+      _id: string;
+      username: string;
+      email: string;
+      image: string;
+    };
+    lastMessage: {
+      senderId: string;
+      senderName: string;
+      receiverId: string;
+      message: {
+        text: string;
+        image: string;
+      };
+      createAt: string;
+    };
   }[];
 };
 
