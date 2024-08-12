@@ -61,7 +61,7 @@ export const messengerApi = emptySplitApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Message'],
+      invalidatesTags: ['Message', 'Friends'],
     }),
     getMessage: builder.query<TMRes, string>({
       query: (id) => ({ url: `/messenger/message/${id}` }),
@@ -88,7 +88,7 @@ export const messengerApi = emptySplitApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: ['Message'],
+      invalidatesTags: ['Message', 'Friends'],
     }),
   }),
 });

@@ -23,6 +23,16 @@ export default function Messenger() {
     { userId: string; socketId: string; userInfo: TFriend }[]
   >([]);
   const [sharedImages, setSharedImages] = useState<string[]>([]);
+  const [socketLastMessage, setSocketLastMessage] = useState<{
+    senderId: string;
+    senderName: string;
+    receiverId: string;
+    message: {
+      text: string;
+      image: string;
+    };
+    createdAt: string;
+  } | null>(null);
 
   // effects
   useEffect(() => {
@@ -43,12 +53,14 @@ export default function Messenger() {
           setCurrentFriend={setCurrentFriend}
           currentFriend={currentFriend}
           activeIds={activeIds}
+          socketLastMessage={socketLastMessage}
         />
       </Col>
       <Col span={12}>
         <ChatBody
           currentFriend={currentFriend}
           setSharedImages={setSharedImages}
+          setSocketLastMessage={setSocketLastMessage}
         />
       </Col>
       <Col span={6}>

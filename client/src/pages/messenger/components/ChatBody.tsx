@@ -7,7 +7,6 @@ import {
   Typography,
   Input,
   Button,
-  Upload,
   notification,
 } from 'antd';
 import { useEffect, useState } from 'react';
@@ -30,6 +29,18 @@ type Props = {
     _id: string;
   } | null;
   setSharedImages: React.Dispatch<React.SetStateAction<string[]>>;
+  setSocketLastMessage: React.Dispatch<
+    React.SetStateAction<{
+      senderId: string;
+      senderName: string;
+      receiverId: string;
+      message: {
+        text: string;
+        image: string;
+      };
+      createdAt: string;
+    } | null>
+  >;
 };
 
 type TMRes = {
@@ -43,7 +54,11 @@ type TMRes = {
   createdAt: string;
 };
 
-export default function ChatBody({ currentFriend, setSharedImages }: Props) {
+export default function ChatBody({
+  currentFriend,
+  setSharedImages,
+  setSocketLastMessage,
+}: Props) {
   const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
@@ -61,7 +76,6 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
     senderId: '',
     isTyping: false,
   });
-  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     setMessages(data?.messages as TMRes[]);
@@ -70,6 +84,7 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
   useEffect(() => {
     socket.on('getMessage', (data) => {
       setSocketMessage(data as TMRes);
+      setSocketLastMessage(data);
     });
     socket.on('typingMessageGet', (data) => {
       setSocketTypingData((prevState) => ({
@@ -78,6 +93,7 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
         isTyping: data.isTyping,
       }));
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -137,6 +153,7 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
         .map((message) => message.message.image);
       setSharedImages(images);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -362,7 +379,7 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
         </div>
       </div>
       <Space.Compact style={{ width: '100%' }}>
-        <Button icon={<FileImageOutlined />}>
+        <Button icon={<FileImageOutlined />} loading={sendImageLoading}>
           <label htmlFor="file">Choose File</label>
           <input
             id="file"

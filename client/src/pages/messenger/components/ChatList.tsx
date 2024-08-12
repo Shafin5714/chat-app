@@ -5,7 +5,7 @@ import { LogoutOutlined } from '@ant-design/icons';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { authSlice } from '@/slices';
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type TFriend = {
   image: string;
@@ -14,16 +14,46 @@ type TFriend = {
   _id: string;
 };
 
+type TFriends = {
+  friend: {
+    _id: string;
+    username: string;
+    email: string;
+    image: string;
+  };
+  lastMessage: {
+    senderId: string;
+    senderName: string;
+    receiverId: string;
+    message: {
+      text: string;
+      image: string;
+    };
+    createAt: string;
+  };
+};
+
 type Props = {
   setCurrentFriend: React.Dispatch<React.SetStateAction<TFriend | null>>;
   currentFriend: TFriend | null;
   activeIds: string[];
+  socketLastMessage: {
+    senderId: string;
+    senderName: string;
+    receiverId: string;
+    message: {
+      text: string;
+      image: string;
+    };
+    createdAt: string;
+  } | null;
 };
 
 export default function ChatList({
   setCurrentFriend,
   currentFriend,
   activeIds,
+  socketLastMessage,
 }: Props) {
   // hooks
   const dispatch = useAppDispatch();
@@ -31,6 +61,8 @@ export default function ChatList({
 
   // state
   const { userInfo } = useAppSelector((state) => state.auth);
+  const [friends, setFriends] = useState<TFriends[]>([]);
+
   const { Search } = Input;
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
@@ -41,7 +73,9 @@ export default function ChatList({
   useEffect(() => {
     if (data?.friends.length) {
       setCurrentFriend(data?.friends[0].friend);
+      setFriends(data.friends);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const activeStyle = {
@@ -53,13 +87,29 @@ export default function ChatList({
     color: 'black',
   };
 
+  useEffect(() => {
+    if (socketLastMessage) {
+      const update = friends.map((friend) => {
+        if (
+          friend.lastMessage.senderId === socketLastMessage?.senderId &&
+          friend.lastMessage.receiverId === socketLastMessage?.receiverId
+        ) {
+          return { ...friend, lastMessage: socketLastMessage };
+        } else {
+          return friend;
+        }
+      });
+      setFriends(update as TFriends[]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socketLastMessage]);
+
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <div>
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
             <Avatar src={`http://localhost:5000${userInfo?.image}`} />
-
             <p>{userInfo?.name}</p>
           </Space>
           <Button
@@ -83,7 +133,7 @@ export default function ChatList({
       </div>
 
       <Space direction="vertical" style={{ width: '100%' }}>
-        {data?.friends.map(({ friend, lastMessage }) => (
+        {friends.map(({ friend, lastMessage }) => (
           <Card
             size="small"
             hoverable
