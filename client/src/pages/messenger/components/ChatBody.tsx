@@ -132,7 +132,10 @@ export default function ChatBody({ currentFriend, setSharedImages }: Props) {
 
   useEffect(() => {
     if (messages?.length) {
-      setSharedImages(messages.map((message) => message.message.image));
+      const images = messages
+        .filter((message) => message.message.image)
+        .map((message) => message.message.image);
+      setSharedImages(images);
     }
   }, [messages]);
 

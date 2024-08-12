@@ -9,8 +9,8 @@ export default function SharedMedia({ sharedImages }: Props) {
     <div style={{ padding: 10 }}>
       <Row gutter={[16, 16]}>
         {sharedImages.length &&
-          sharedImages.map((image) => (
-            <Col span={8} key={image}>
+          sharedImages.map((image, index) => (
+            <Col span={8} key={index}>
               <img
                 src={`http://localhost:5000${image}`}
                 alt="Image"
