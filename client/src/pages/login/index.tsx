@@ -1,4 +1,4 @@
-import { Button, Form, Input, Card } from 'antd';
+import { Button, Form, Input, Card, Typography } from 'antd';
 import { useEffect } from 'react';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
@@ -86,12 +86,15 @@ export default function Index() {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Form.Item style={{ display: 'flex', justifyContent: 'center' }}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
               Submit
             </Button>
           </Form.Item>
         </Form>
+        <div style={{ textAlign: 'center', marginTop: 30 }}>
+          <Link to="/register">Register</Link>
+        </div>
       </Card>
     </AuthContainer>
   );

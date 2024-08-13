@@ -5,7 +5,7 @@ import AuthContainer from '@/components/AuthContainer';
 import { useRegisterMutation } from '../../store/apis/auth';
 import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { GetProp, UploadFile, UploadProps } from 'antd';
 import ImgCrop from 'antd-img-crop';
 
@@ -102,7 +102,7 @@ export default function Register() {
           name="basic"
           labelCol={{ span: 10 }}
           wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 700 }}
+          style={{ maxWidth: 700, width: 400 }}
           initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
@@ -184,13 +184,15 @@ export default function Register() {
           </Flex>
 
           <Form.Item
-            wrapperCol={{ offset: 8, span: 16 }}
-            style={{ marginTop: 20 }}
+            style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}
           >
-            <Button type="primary" htmlType="submit" style={{ marginTop: 10 }}>
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
+          <div style={{ textAlign: 'center', marginTop: 20 }}>
+            <Link to="/login">Login</Link>
+          </div>
         </Form>
       </Card>
     </AuthContainer>
