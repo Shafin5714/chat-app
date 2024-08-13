@@ -10,7 +10,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       res.status(409);
       throw new Error('User already exists');
     } else {
-      const user = User.create({
+      const user = await User.create({
         username: req.body.username,
         email: req.body.email,
         password: req.body.password,
@@ -18,9 +18,14 @@ export const registerUser = asyncHandler(async (req, res) => {
       });
       if (user) {
         res.status(201).json({
-          _id: user._id,
-          username: user.username,
-          email: user.email,
+          status: 'success',
+          message: 'Registration successful',
+          data: {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            image: user.image,
+          },
           token: generateToken(user._id),
         });
       } else {
@@ -34,16 +39,21 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// login
 export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
 
   if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.username,
-      email: user.email,
-      image: user.image,
+    res.status(200).json({
+      status: 'success',
+      message: 'Login successful',
+      data: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        image: user.image,
+      },
       token: generateToken(user._id),
     });
   } else {

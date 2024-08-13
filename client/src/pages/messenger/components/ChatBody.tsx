@@ -158,14 +158,14 @@ export default function ChatBody({
 
   const handleSendMessage = async () => {
     const newMessage = {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       receiverId: currentFriend?._id as string,
       message,
     };
     const res = await sendMessage(newMessage).unwrap();
 
     socket.emit('sendMessage', {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,
       message: {
@@ -195,7 +195,7 @@ export default function ChatBody({
 
   const handleImage = async (e: any) => {
     const formData = new FormData();
-    formData.append('senderName', userInfo?.name as string);
+    formData.append('senderName', userInfo?.username as string);
     formData.append('senderId', userInfo?._id as string);
     formData.append('receiverId', currentFriend?._id as string);
     formData.append('image', e.target.files[0]);
@@ -209,7 +209,7 @@ export default function ChatBody({
     };
 
     socket.emit('sendMessage', {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,
       message: {

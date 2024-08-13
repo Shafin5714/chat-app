@@ -6,7 +6,7 @@ import { useRegisterMutation } from '../../store/apis/auth';
 import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
 import { Link, useNavigate } from 'react-router-dom';
-import type { GetProp, UploadFile, UploadProps } from 'antd';
+import { GetProp, UploadFile, UploadProps, notification } from 'antd';
 import ImgCrop from 'antd-img-crop';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
@@ -37,7 +37,7 @@ export default function Register() {
     }
   }, [navigate, userInfo]);
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('Success:', values);
     const { username, email, password } = values;
     const formData = new FormData();
@@ -46,9 +46,16 @@ export default function Register() {
     formData.append('password', password ? password : '');
 
     formData.append('image', file as File);
-    // formData.append('image', fileList[0].originFileObj as File);
 
-    registerUser(formData);
+    const res = await registerUser(formData).unwrap();
+    console.log(res);
+
+    if (res.status === 'success') {
+      notification.open({
+        message: res.message,
+      });
+      navigate('/login');
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (
@@ -56,10 +63,6 @@ export default function Register() {
   ) => {
     console.log('Failed:', errorInfo);
   };
-
-  // const handleImage = (event: any) => {
-  //   setFile(event.target.files[0]);
-  // };
 
   const props: UploadProps = {
     onRemove: (file) => {
