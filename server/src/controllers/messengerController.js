@@ -35,7 +35,7 @@ export const getFriends = asyncHandler(async (req, res) => {
     }),
   );
 
-  res.status(200).json({ friends });
+  res.status(200).json({ status: 'success', data: friends });
 });
 
 export const sendMessage = asyncHandler(async (req, res) => {
@@ -52,8 +52,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
 
   if (insertMessage) {
     res.status(201).json({
-      success: true,
-      message: {
+      status: 'success',
+      data: {
         senderId: req.user._id,
         senderName,
         receiverId,
@@ -97,7 +97,7 @@ export const getMessage = asyncHandler(async (req, res) => {
   // );
 
   res.status(200).json({
-    success: true,
+    status: 'success',
     messages: getMessages,
   });
 });
@@ -117,8 +117,8 @@ export const sendImage = asyncHandler(async (req, res) => {
     });
     if (insertMessage) {
       res.status(201).json({
-        success: true,
-        message: {
+        status: 'success',
+        data: {
           senderId: req.user._id,
           senderName,
           receiverId,
