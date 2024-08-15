@@ -32,7 +32,7 @@ const baseQueryWithReauth: BaseQueryFn<
   }
 
   if (result.error) {
-    console.log(result.error);
+    console.error(result.error);
   }
   return result;
 };

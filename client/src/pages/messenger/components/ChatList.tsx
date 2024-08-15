@@ -29,7 +29,7 @@ type TFriends = {
       text: string;
       image: string;
     };
-    createAt: string;
+    createdAt: string;
   };
 };
 
@@ -71,10 +71,14 @@ export default function ChatList({
   const { data } = useGetFriendsQuery();
 
   useEffect(() => {
-    if (data?.friends.length) {
-      setCurrentFriend(data?.friends[0].friend);
-      setFriends(data.friends);
+    if (data?.length) {
+      setFriends(data);
+
+      if (!currentFriend) {
+        setCurrentFriend(data[0]?.friend);
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
@@ -91,6 +95,7 @@ export default function ChatList({
     if (socketLastMessage) {
       const update = friends.map((friend) => {
         if (
+          friend.lastMessage &&
           friend.lastMessage.senderId === socketLastMessage?.senderId &&
           friend.lastMessage.receiverId === socketLastMessage?.receiverId
         ) {
@@ -110,7 +115,7 @@ export default function ChatList({
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
             <Avatar src={`http://localhost:5000${userInfo?.image}`} />
-            <p>{userInfo?.name}</p>
+            <p>{userInfo?.username}</p>
           </Space>
           <Button
             shape="circle"
@@ -149,14 +154,16 @@ export default function ChatList({
               </Badge>
               <Space direction="vertical" size={2}>
                 <p style={{ fontSize: 15 }}>{friend.username}</p>
-                <p style={{ fontSize: 12, color: 'gray' }}>
-                  {lastMessage.senderId === userInfo?._id ? 'You: ' : ''}
-                  {lastMessage.message.text
-                    ? `${lastMessage.message.text.slice(0, 10)}${
-                        lastMessage.message.text.length > 10 ? '...' : ''
-                      }`
-                    : ' Sent an image'}
-                </p>
+                {lastMessage ? (
+                  <p style={{ fontSize: 12, color: 'gray' }}>
+                    {lastMessage?.senderId === userInfo?._id ? 'You: ' : ''}
+                    {lastMessage?.message.text
+                      ? `${lastMessage.message.text.slice(0, 10)}${
+                          lastMessage.message.text.length > 10 ? '...' : ''
+                        }`
+                      : ' Sent an image'}
+                  </p>
+                ) : null}
               </Space>
             </Space>
           </Card>

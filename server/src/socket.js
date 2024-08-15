@@ -45,7 +45,7 @@ const setUpSocket = (server) => {
           senderId: data.senderId,
           senderName: data.senderName,
           receiverId: data.receiverId,
-          createAt: data.time,
+          createdAt: data.time,
           message: {
             text: data.message.text,
             image: data.message.image,

@@ -43,7 +43,7 @@ type Props = {
   >;
 };
 
-type TMRes = {
+type Message = {
   senderId: string;
   senderName: string;
   receiverId: string;
@@ -63,11 +63,11 @@ export default function ChatBody({
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
   const [sendImage, { isLoading: sendImageLoading }] = useSendImageMutation();
-  const [socketMessage, setSocketMessage] = useState<TMRes | null>(null);
+  const [socketMessage, setSocketMessage] = useState<Message | null>(null);
   const { data } = useGetMessageQuery(
     currentFriend?._id ? currentFriend?._id : skipToken,
   );
-  const [messages, setMessages] = useState<TMRes[] | []>([]);
+  const [messages, setMessages] = useState<Message[] | []>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [socketTypingData, setSocketTypingData] = useState<{
     senderId: string;
@@ -78,12 +78,12 @@ export default function ChatBody({
   });
 
   useEffect(() => {
-    setMessages(data?.messages as TMRes[]);
+    setMessages(data?.messages as Message[]);
   }, [data]);
 
   useEffect(() => {
     socket.on('getMessage', (data) => {
-      setSocketMessage(data as TMRes);
+      setSocketMessage(data as Message);
       setSocketLastMessage(data);
     });
     socket.on('typingMessageGet', (data) => {
@@ -110,7 +110,7 @@ export default function ChatBody({
         socketMessage?.senderId === currentFriend?._id &&
         socketMessage.receiverId === userInfo?._id
       ) {
-        setMessages([...messages, socketMessage as TMRes]);
+        setMessages([...messages, socketMessage as Message]);
       }
 
       // notification
@@ -158,14 +158,14 @@ export default function ChatBody({
 
   const handleSendMessage = async () => {
     const newMessage = {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       receiverId: currentFriend?._id as string,
       message,
     };
     const res = await sendMessage(newMessage).unwrap();
 
     socket.emit('sendMessage', {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,
       message: {
@@ -177,11 +177,11 @@ export default function ChatBody({
 
     if (res) {
       const newMessage = {
-        createdAt: res.message.createdAt,
-        message: res.message.message,
-        receiverId: res.message.receiverId,
-        senderName: res.message.senderName,
-        senderId: res.message.senderId,
+        createdAt: res.data.createdAt,
+        message: res.data.message,
+        receiverId: res.data.receiverId,
+        senderName: res.data.senderName,
+        senderId: res.data.senderId,
       };
 
       setMessages((prevState) => [...prevState, newMessage]);
@@ -195,26 +195,27 @@ export default function ChatBody({
 
   const handleImage = async (e: any) => {
     const formData = new FormData();
-    formData.append('senderName', userInfo?.name as string);
+    formData.append('senderName', userInfo?.username as string);
     formData.append('senderId', userInfo?._id as string);
     formData.append('receiverId', currentFriend?._id as string);
     formData.append('image', e.target.files[0]);
     const res = await sendImage(formData).unwrap();
+
     const newMessage = {
-      createdAt: res.message.createdAt,
-      message: res.message.message,
-      receiverId: res.message.receiverId,
-      senderName: res.message.senderName,
-      senderId: res.message.senderId,
+      createdAt: res.data.createdAt,
+      message: res.data.message,
+      receiverId: res.data.receiverId,
+      senderName: res.data.senderName,
+      senderId: res.data.senderId,
     };
 
     socket.emit('sendMessage', {
-      senderName: userInfo?.name as string,
+      senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,
       message: {
         text: '',
-        image: res.message.message.image,
+        image: res.data.message.image,
       },
       time: new Date(),
     });

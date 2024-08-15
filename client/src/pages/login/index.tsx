@@ -1,4 +1,4 @@
-import { Button, Form, Input, Card, Typography } from 'antd';
+import { Button, Form, Input, Card, notification } from 'antd';
 import { useEffect } from 'react';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
@@ -10,6 +10,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 type FieldType = {
   email?: string;
   password?: string;
+};
+
+type CustomError = {
+  status: number;
+  data: {
+    message: string;
+  };
 };
 
 export default function Index() {
@@ -38,10 +45,26 @@ export default function Index() {
         password: password as string,
       }).unwrap();
 
-      dispatch(authSlice.actions.setData({ ...res }));
-      navigate(redirect);
-    } catch (err) {
-      // toast.error(err?.data?.message || err.error);
+      if (res.status === 'success') {
+        const { _id, username, email, image } = res.data;
+        dispatch(
+          authSlice.actions.setData({
+            _id,
+            token: res.token,
+            username,
+            email,
+            image,
+          }),
+        );
+        navigate(redirect);
+        notification.success({
+          message: res.message,
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: (error as CustomError).data.message,
+      });
     }
   };
 
