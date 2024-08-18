@@ -47,7 +47,7 @@ export default function Messenger() {
   const activeIds = activeUsers.map((user) => user.userId);
 
   return (
-    <Row>
+    <Row style={{ marginTop: 10, padding: '0 10px' }}>
       <Col span={6}>
         <ChatList
           setCurrentFriend={setCurrentFriend}
