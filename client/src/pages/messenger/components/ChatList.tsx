@@ -1,4 +1,14 @@
-import { Flex, Space, Avatar, Divider, Input, Card, Button, Badge } from 'antd';
+import {
+  Flex,
+  Space,
+  Avatar,
+  Divider,
+  Input,
+  Card,
+  Button,
+  Badge,
+  Typography,
+} from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import messengerApi, { useGetFriendsQuery } from '@/apis/messenger';
 import { LogoutOutlined } from '@ant-design/icons';
@@ -58,6 +68,7 @@ export default function ChatList({
   // hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { Title } = Typography;
 
   // state
   const { userInfo } = useAppSelector((state) => state.auth);
@@ -110,12 +121,19 @@ export default function ChatList({
   }, [socketLastMessage]);
 
   return (
-    <Space direction="vertical" style={{ width: '100%' }}>
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: 10,
+        border: '1px solid #d3d3d3',
+        height: '97.5vh',
+      }}
+    >
       <div>
         <Flex justify="space-between" align="center" style={{ padding: 10 }}>
           <Space>
             <Avatar src={`http://localhost:5000${userInfo?.image}`} />
-            <p>{userInfo?.username}</p>
+            <Title level={5}>{userInfo?.username}</Title>
           </Space>
           <Button
             shape="circle"
@@ -137,7 +155,7 @@ export default function ChatList({
         <Search placeholder="input search text" onSearch={onSearch} />
       </div>
 
-      <Space direction="vertical" style={{ width: '100%' }}>
+      <Space direction="vertical" style={{ width: '100%', padding: '0 15px' }}>
         {friends.map(({ friend, lastMessage }) => (
           <Card
             size="small"
@@ -153,7 +171,9 @@ export default function ChatList({
                 <Avatar src={`http://localhost:5000${friend.image}`} />
               </Badge>
               <Space direction="vertical" size={2}>
-                <p style={{ fontSize: 15 }}>{friend.username}</p>
+                <Typography style={{ fontSize: 15 }}>
+                  {friend.username}
+                </Typography>
                 {lastMessage ? (
                   <p style={{ fontSize: 12, color: 'gray' }}>
                     {lastMessage?.senderId === userInfo?._id ? 'You: ' : ''}
@@ -169,6 +189,6 @@ export default function ChatList({
           </Card>
         ))}
       </Space>
-    </Space>
+    </div>
   );
 }

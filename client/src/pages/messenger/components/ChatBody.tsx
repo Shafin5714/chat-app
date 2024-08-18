@@ -225,50 +225,113 @@ export default function ChatBody({
   };
 
   return (
-    <div style={{ height: '100vh' }}>
-      <Flex justify="space-between" align="center" style={{ padding: 10 }}>
-        <Space>
-          <Avatar
-            src={
-              <img
-                src={`http://localhost:5000${currentFriend?.image}`}
-                alt="avatar"
-              />
-            }
-          />
-          <p>{currentFriend?.username}</p>
-        </Space>
-      </Flex>
-      <Divider style={{ margin: 0 }} />
+    <div style={{ paddingLeft: 10, paddingRight: 10 }}>
       <div
         style={{
-          overflowY: 'auto',
-          height: `calc(100% - 100px)`,
+          background: '#FFFFFF',
+          borderRadius: 10,
+          border: '1px solid #d3d3d3',
+          height: '97.5vh',
         }}
       >
-        <div style={{ padding: 10 }}>
-          {messages?.length > 0
-            ? messages.map((m, index) =>
-                m.senderId === userInfo?._id ? (
-                  <Flex
-                    justify="flex-end"
-                    align="center"
-                    key={index}
-                    style={{ margin: '10px 0px' }}
-                    ref={msgEndRef}
-                  >
+        <Flex justify="space-between" align="center" style={{ padding: 10 }}>
+          <Space>
+            <Avatar
+              src={
+                <img
+                  src={`http://localhost:5000${currentFriend?.image}`}
+                  alt="avatar"
+                />
+              }
+            />
+            <Typography.Title level={5}>
+              {currentFriend?.username}
+            </Typography.Title>
+          </Space>
+        </Flex>
+        <Divider style={{ margin: 0 }} />
+        <div
+          style={{
+            overflowY: 'auto',
+            height: `calc(100% - 100px)`,
+          }}
+        >
+          <div style={{ padding: 10 }}>
+            {messages?.length > 0
+              ? messages.map((m, index) =>
+                  m.senderId === userInfo?._id ? (
+                    <Flex
+                      justify="flex-end"
+                      align="center"
+                      key={index}
+                      style={{ margin: '10px 0px' }}
+                      ref={msgEndRef}
+                    >
+                      <div
+                        style={{
+                          maxWidth: 450,
+                        }}
+                      >
+                        {m.message.text ? (
+                          <>
+                            <Flex justify="flex-end">
+                              <Typography
+                                style={{
+                                  color: 'white',
+                                  background: '#579ffb',
+                                  padding: 10,
+                                  borderRadius: 10,
+                                }}
+                              >
+                                {m.message.text}
+                              </Typography>
+                            </Flex>
+                            <Flex justify="flex-end">
+                              <Typography style={{ fontSize: 10 }}>
+                                {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                              </Typography>
+                            </Flex>
+                          </>
+                        ) : (
+                          <div>
+                            <div
+                              style={{
+                                padding: 10,
+                                border: '1px solid gray',
+                                borderRadius: 5,
+                              }}
+                              ref={msgEndRef}
+                            >
+                              <img
+                                src={`http://localhost:5000${m.message.image}`}
+                                alt=""
+                                width={300}
+                              />
+                            </div>
+                            <Flex justify="flex-end">
+                              <Typography style={{ fontSize: 10 }}>
+                                {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
+                              </Typography>
+                            </Flex>
+                          </div>
+                        )}
+                      </div>
+                    </Flex>
+                  ) : (
                     <div
                       style={{
                         maxWidth: 450,
+                        margin: '10px 0px',
                       }}
+                      key={index}
+                      ref={msgEndRef}
                     >
                       {m.message.text ? (
                         <>
-                          <Flex justify="flex-end">
+                          <Flex>
                             <Typography
                               style={{
-                                color: 'white',
-                                background: '#579ffb',
+                                background: '#ececec',
                                 padding: 10,
                                 borderRadius: 10,
                               }}
@@ -276,126 +339,98 @@ export default function ChatBody({
                               {m.message.text}
                             </Typography>
                           </Flex>
-                          <Flex justify="flex-end">
+
+                          <Flex justify="flex-start">
                             <Typography style={{ fontSize: 10 }}>
                               {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
                             </Typography>
                           </Flex>
                         </>
                       ) : (
-                        <div>
-                          <div
-                            style={{
-                              padding: 10,
-                              border: '1px solid gray',
-                              borderRadius: 5,
-                            }}
-                            ref={msgEndRef}
-                          >
-                            <img
-                              src={`http://localhost:5000${m.message.image}`}
-                              alt=""
-                              width={300}
-                            />
-                          </div>
-                          <Flex justify="flex-end">
+                        <>
+                          <Flex ref={msgEndRef}>
+                            <div
+                              style={{
+                                padding: 10,
+                                border: '1px solid gray',
+                                borderRadius: 5,
+                              }}
+                            >
+                              <img
+                                src={`http://localhost:5000${m.message.image}`}
+                                alt=""
+                                width={300}
+                              />
+                            </div>
+                          </Flex>
+                          <Flex justify="flex-start">
                             <Typography style={{ fontSize: 10 }}>
                               {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
                             </Typography>
                           </Flex>
-                        </div>
+                        </>
                       )}
                     </div>
-                  </Flex>
-                ) : (
-                  <div
-                    style={{
-                      maxWidth: 450,
-                      margin: '10px 0px',
-                    }}
-                    key={index}
-                    ref={msgEndRef}
-                  >
-                    {m.message.text ? (
-                      <>
-                        <Flex>
-                          <Typography
-                            style={{
-                              background: '#ececec',
-                              padding: 10,
-                              borderRadius: 10,
-                            }}
-                          >
-                            {m.message.text}
-                          </Typography>
-                        </Flex>
-
-                        <Flex justify="flex-start">
-                          <Typography style={{ fontSize: 10 }}>
-                            {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
-                          </Typography>
-                        </Flex>
-                      </>
-                    ) : (
-                      <>
-                        <Flex ref={msgEndRef}>
-                          <div
-                            style={{
-                              padding: 10,
-                              border: '1px solid gray',
-                              borderRadius: 5,
-                            }}
-                          >
-                            <img
-                              src={`http://localhost:5000${m.message.image}`}
-                              alt=""
-                              width={300}
-                            />
-                          </div>
-                        </Flex>
-                        <Flex justify="flex-start">
-                          <Typography style={{ fontSize: 10 }}>
-                            {dayjs(m.createdAt).format('DD/MM/YYYY h:mm A')}
-                          </Typography>
-                        </Flex>
-                      </>
-                    )}
-                  </div>
-                ),
-              )
-            : null}
-          {isTyping ? (
-            <Flex align="center" style={{ margin: '10px 0px' }} ref={msgEndRef}>
-              <Typography
-                style={{
-                  padding: 10,
-                  borderRadius: 10,
-                  background: '#ececec',
-                }}
+                  ),
+                )
+              : null}
+            {isTyping ? (
+              <Flex
+                align="center"
+                style={{ margin: '10px 0px' }}
+                ref={msgEndRef}
               >
-                Typing...
-              </Typography>
-            </Flex>
-          ) : null}
-        </div>
-      </div>
-      <Space.Compact style={{ width: '100%' }}>
-        <Button icon={<FileImageOutlined />} loading={sendImageLoading}>
-          <label htmlFor="file">Choose File</label>
-          <input
-            id="file"
-            type="file"
-            onChange={handleImage}
-            style={{ display: 'none' }}
-            hidden
-          />
-        </Button>
+                <Typography.Text
+                  italic
+                  style={{
+                    padding: 10,
+                    borderRadius: 10,
+                    background: '#ececec',
+                  }}
+                >
+                  Typing...
+                </Typography.Text>
+              </Flex>
+            ) : null}
 
-        <Input value={message} onChange={(e) => handleInput(e.target.value)} />
-        <Button type="primary" onClick={handleSendMessage} loading={isLoading}>
-          Send
-        </Button>
-      </Space.Compact>
+            {messages?.length === 0 && !isTyping ? (
+              <Flex
+                justify="center"
+                align="center"
+                style={{ height: '100%', paddingTop: 300 }}
+              >
+                <Typography.Title level={5}>
+                  Start Conversation
+                </Typography.Title>
+              </Flex>
+            ) : null}
+          </div>
+        </div>
+        <Space.Compact style={{ width: '100%', padding: 10 }}>
+          <Button icon={<FileImageOutlined />} loading={sendImageLoading}>
+            <label htmlFor="file">Choose File</label>
+            <input
+              id="file"
+              type="file"
+              onChange={handleImage}
+              style={{ display: 'none' }}
+              hidden
+            />
+          </Button>
+
+          <Input
+            value={message}
+            onChange={(e) => handleInput(e.target.value)}
+          />
+          <Button
+            type="primary"
+            onClick={handleSendMessage}
+            loading={isLoading}
+          >
+            Send
+          </Button>
+        </Space.Compact>
+      </div>
     </div>
   );
 }
