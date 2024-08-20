@@ -16,6 +16,7 @@ import { useAppSelector, useAppDispatch } from '@/store';
 import { authSlice } from '@/slices';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import { socket } from '../../../socket';
 
 type TFriend = {
   image: string;
@@ -137,16 +138,13 @@ export default function ChatList({
           </Space>
           <Button
             shape="circle"
-            icon={
-              <LogoutOutlined
-                style={{ color: 'red' }}
-                onClick={() => {
-                  dispatch(authSlice.actions.logout());
-                  dispatch(messengerApi.util.resetApiState());
-                  navigate('/login');
-                }}
-              />
-            }
+            onClick={() => {
+              dispatch(authSlice.actions.logout());
+              dispatch(messengerApi.util.resetApiState());
+              socket.disconnect();
+              navigate('/login');
+            }}
+            icon={<LogoutOutlined style={{ color: 'red' }} />}
           />
         </Flex>
         <Divider style={{ margin: 0 }} />

@@ -36,6 +36,7 @@ export default function Messenger() {
 
   // effects
   useEffect(() => {
+    socket.connect(); //for user logout and login again
     if (userInfo) {
       socket.emit('addUser', userInfo._id, userInfo);
       socket.on('getUser', (users) => {
