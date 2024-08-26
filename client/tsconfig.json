@@ -27,6 +27,7 @@
       "@/apis/*":["store/apis/*"],
       "@/store": ["store"],
       "@/slices": ["store/slices"],
+      "@/contexts/*": ["contexts/*"],
     }
   },
   "include": ["src"],

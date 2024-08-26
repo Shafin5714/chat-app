@@ -1,11 +1,9 @@
 import { Button, Form, Input, Card, notification } from 'antd';
-import { useEffect } from 'react';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
 import { useLoginMutation } from '@/apis/auth';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { authSlice } from '@/slices';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthProvider';
 
 type FieldType = {
   email?: string;
@@ -21,41 +19,32 @@ type CustomError = {
 
 export default function Index() {
   // hooks
-  const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const [loginMutation, { isLoading }] = useLoginMutation();
 
-  const { userInfo } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
 
   const { search } = useLocation();
   const sp = new URLSearchParams(search);
   const redirect = sp.get('redirect') || '/';
 
-  useEffect(() => {
-    if (userInfo) {
-      navigate(redirect);
-    }
-  }, [navigate, redirect, userInfo]);
-
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     const { email, password } = values;
     try {
-      const res = await login({
+      const res = await loginMutation({
         email: email as string,
         password: password as string,
       }).unwrap();
 
       if (res.status === 'success') {
         const { _id, username, email, image } = res.data;
-        dispatch(
-          authSlice.actions.setData({
-            _id,
-            token: res.token,
-            username,
-            email,
-            image,
-          }),
-        );
+        login({
+          _id,
+          token: res.token,
+          username,
+          email,
+          image,
+        });
         navigate(redirect);
         notification.success({
           message: res.message,

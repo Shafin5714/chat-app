@@ -10,13 +10,12 @@ import {
   Typography,
 } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
-import messengerApi, { useGetFriendsQuery } from '@/apis/messenger';
+import { useGetFriendsQuery } from '@/apis/messenger';
 import { LogoutOutlined } from '@ant-design/icons';
-import { useAppSelector, useAppDispatch } from '@/store';
-import { authSlice } from '@/slices';
+import { useAppSelector } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { socket } from '../../../socket';
+import { useAuthContext } from '@/contexts/AuthProvider';
 
 type TFriend = {
   image: string;
@@ -67,14 +66,13 @@ export default function ChatList({
   socketLastMessage,
 }: Props) {
   // hooks
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { Title } = Typography;
+  const { logout } = useAuthContext();
+  const navigate = useNavigate();
 
   // state
   const { userInfo } = useAppSelector((state) => state.auth);
   const [friends, setFriends] = useState<TFriends[]>([]);
-
   const { Search } = Input;
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
@@ -139,9 +137,7 @@ export default function ChatList({
           <Button
             shape="circle"
             onClick={() => {
-              dispatch(authSlice.actions.logout());
-              dispatch(messengerApi.util.resetApiState());
-              socket.disconnect();
+              logout();
               navigate('/login');
             }}
             icon={<LogoutOutlined style={{ color: 'red' }} />}

@@ -31,12 +31,6 @@ export default function Register() {
   const { userInfo } = useAppSelector((state) => state.auth);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  useEffect(() => {
-    if (userInfo) {
-      navigate('/');
-    }
-  }, [navigate, userInfo]);
-
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('Success:', values);
     const { username, email, password } = values;
