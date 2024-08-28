@@ -3,7 +3,7 @@ import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
 import { useLoginMutation } from '@/apis/auth';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthContext } from '@/contexts/AuthProvider';
+import { useAuthContext } from '@/contexts';
 
 type FieldType = {
   email?: string;

@@ -6,7 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -22,15 +21,14 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "src",
     "paths": {
-      "@/pages/*":["pages/*"],
-      "@/components/*":["components/*"],
-      "@/apis/*":["store/apis/*"],
+      "@/pages/*": ["pages/*"],
+      "@/components/*": ["components/*"],
+      "@/apis/*": ["store/apis/*"],
       "@/store": ["store"],
       "@/slices": ["store/slices"],
-      "@/contexts/*": ["contexts/*"],
+      "@/contexts": ["contexts"]
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-  
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

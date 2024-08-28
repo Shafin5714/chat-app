@@ -15,7 +15,7 @@ import { LogoutOutlined } from '@ant-design/icons';
 import { useAppSelector } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { useAuthContext } from '@/contexts/AuthProvider';
+import { useAuthContext, useSocketContext } from '@/contexts';
 
 type TFriend = {
   image: string;
@@ -69,6 +69,7 @@ export default function ChatList({
   const { Title } = Typography;
   const { logout } = useAuthContext();
   const navigate = useNavigate();
+  const { socket } = useSocketContext();
 
   // state
   const { userInfo } = useAppSelector((state) => state.auth);

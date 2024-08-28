@@ -8,8 +8,7 @@ import {
 import { useAppSelector, useAppDispatch } from '@/store';
 import { authSlice } from '@/slices';
 import messengerApi from '@/apis/messenger';
-import { socket } from '../socket';
-
+import { useSocketContext } from '@/contexts';
 type Props = {
   children: ReactNode;
 };
@@ -37,6 +36,7 @@ const AuthContext = createContext<{
 export function AuthProvider({ children }: Props) {
   // hooks
   const dispatch = useAppDispatch();
+  const { socket } = useSocketContext();
 
   // state
   const [isLoading, setIsLoading] = useState(false);
@@ -69,9 +69,9 @@ export function AuthProvider({ children }: Props) {
   };
 
   const logout = () => {
+    socket?.disconnect();
     dispatch(authSlice.actions.logout());
     dispatch(messengerApi.util.resetApiState());
-    socket.disconnect();
   };
 
   return (

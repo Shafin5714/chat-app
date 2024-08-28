@@ -1,5 +1,5 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import { useAuthContext } from '@/contexts/AuthProvider';
+import { useAuthContext } from '@/contexts';
 import { useAppSelector } from '@/store';
 
 const PublicRoute = () => {

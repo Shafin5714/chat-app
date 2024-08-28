@@ -4,7 +4,7 @@ import ChatBody from './components/ChatBody';
 import SharedMedia from './components/SharedMedia';
 import { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store';
-import { socket } from '../../socket';
+import { useSocketContext } from '@/contexts';
 
 type TFriend = {
   image: string;
@@ -14,6 +14,8 @@ type TFriend = {
 };
 
 export default function Messenger() {
+  // hooks
+  const { socket } = useSocketContext();
   // store
   const { userInfo } = useAppSelector((store) => store.auth);
 
@@ -36,10 +38,10 @@ export default function Messenger() {
 
   // effects
   useEffect(() => {
-    socket.connect(); //for user logout and login again
+    socket?.connect(); //for user logout and login again
     if (userInfo) {
-      socket.emit('addUser', userInfo._id, userInfo);
-      socket.on('getUser', (users) => {
+      socket?.emit('addUser', userInfo._id, userInfo);
+      socket?.on('getUser', (users) => {
         setActiveUsers(users);
       });
     }

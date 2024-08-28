@@ -16,7 +16,7 @@ import Register from '@/pages/register';
 import Messenger from '@/pages/messenger';
 import PrivateRoute from '@/components/PrivateRoute';
 import PublicRoute from '@/components/PublicRoute.tsx';
-import { AuthProvider } from '@/contexts/AuthProvider.tsx';
+import { AuthProvider, SocketProvider } from '@/contexts';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,7 +37,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <ConfigProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <SocketProvider>
+            <RouterProvider router={router} />
+          </SocketProvider>
         </AuthProvider>
       </ConfigProvider>
     </Provider>
