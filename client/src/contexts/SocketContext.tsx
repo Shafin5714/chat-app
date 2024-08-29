@@ -25,6 +25,7 @@ export const SocketProvider = ({ children }: Props) => {
   useEffect(() => {
     if (userInfo) {
       const socket = io('http://localhost:5000');
+
       setSocket(socket);
     } else {
       if (socket) {
@@ -32,13 +33,6 @@ export const SocketProvider = ({ children }: Props) => {
         setSocket(null);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    return () => {
-      () => {
-        setSocket(null);
-        socket?.close();
-      };
-    };
   }, [userInfo]);
 
   return (

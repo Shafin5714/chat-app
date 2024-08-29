@@ -95,8 +95,7 @@ export default function ChatBody({
         isTyping: data.isTyping,
       }));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (socketTypingData.senderId === currentFriend?._id) {
@@ -136,7 +135,7 @@ export default function ChatBody({
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message]);
+  }, [message, socket]);
 
   // scroll to bottom
   const msgEndRef = useRef<null | HTMLDivElement>(null);

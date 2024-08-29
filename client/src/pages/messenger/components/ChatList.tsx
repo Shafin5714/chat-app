@@ -69,7 +69,6 @@ export default function ChatList({
   const { Title } = Typography;
   const { logout } = useAuthContext();
   const navigate = useNavigate();
-  const { socket } = useSocketContext();
 
   // state
   const { userInfo } = useAppSelector((state) => state.auth);
@@ -106,15 +105,29 @@ export default function ChatList({
     if (socketLastMessage) {
       const update = friends.map((friend) => {
         if (
-          friend.lastMessage &&
-          friend.lastMessage.senderId === socketLastMessage?.senderId &&
-          friend.lastMessage.receiverId === socketLastMessage?.receiverId
+          (friend?.lastMessage?.senderId === socketLastMessage?.senderId &&
+            friend?.lastMessage?.receiverId ===
+              socketLastMessage?.receiverId) ||
+          (friend?.lastMessage?.senderId === socketLastMessage?.receiverId &&
+            friend?.lastMessage?.receiverId === socketLastMessage?.senderId)
         ) {
           return { ...friend, lastMessage: socketLastMessage };
         } else {
           return friend;
         }
       });
+
+      const updateIndex = update.findIndex(
+        (friend) =>
+          friend.lastMessage === null &&
+          currentFriend?._id === socketLastMessage.senderId,
+      );
+
+      update[updateIndex] = {
+        ...update[updateIndex],
+        lastMessage: socketLastMessage,
+      };
+
       setFriends(update as TFriends[]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
