@@ -104,29 +104,12 @@ export default function ChatList({
   useEffect(() => {
     if (socketLastMessage) {
       const update = friends.map((friend) => {
-        if (
-          (friend?.lastMessage?.senderId === socketLastMessage?.senderId &&
-            friend?.lastMessage?.receiverId ===
-              socketLastMessage?.receiverId) ||
-          (friend?.lastMessage?.senderId === socketLastMessage?.receiverId &&
-            friend?.lastMessage?.receiverId === socketLastMessage?.senderId)
-        ) {
+        if (socketLastMessage.senderId === friend.friend._id) {
           return { ...friend, lastMessage: socketLastMessage };
         } else {
           return friend;
         }
       });
-
-      const updateIndex = update.findIndex(
-        (friend) =>
-          friend.lastMessage === null &&
-          currentFriend?._id === socketLastMessage.senderId,
-      );
-
-      update[updateIndex] = {
-        ...update[updateIndex],
-        lastMessage: socketLastMessage,
-      };
 
       setFriends(update as TFriends[]);
     }
