@@ -17,9 +17,9 @@ import {
 } from '@/apis/messenger';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
-import { socket } from '../../../socket';
 import { FileImageOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useSocketContext } from '@/contexts';
 
 type Props = {
   currentFriend: {
@@ -59,6 +59,8 @@ export default function ChatBody({
   setSharedImages,
   setSocketLastMessage,
 }: Props) {
+  // hooks
+  const { socket } = useSocketContext();
   const [message, setMessage] = useState('');
   const { userInfo } = useAppSelector((store) => store.auth);
   const [sendMessage, { isLoading }] = useSendMessageMutation();
@@ -82,19 +84,18 @@ export default function ChatBody({
   }, [data]);
 
   useEffect(() => {
-    socket.on('getMessage', (data) => {
+    socket?.on('getMessage', (data) => {
       setSocketMessage(data as Message);
       setSocketLastMessage(data);
     });
-    socket.on('typingMessageGet', (data) => {
+    socket?.on('typingMessageGet', (data) => {
       setSocketTypingData((prevState) => ({
         ...prevState,
         senderId: data.senderId,
         isTyping: data.isTyping,
       }));
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     if (socketTypingData.senderId === currentFriend?._id) {
@@ -127,14 +128,14 @@ export default function ChatBody({
   }, [socketMessage]);
 
   useEffect(() => {
-    socket.emit('typingMessage', {
+    socket?.emit('typingMessage', {
       senderId: userInfo?._id,
       receiverId: currentFriend?._id,
       isTyping: message.length > 0 ? true : false,
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message]);
+  }, [message, socket]);
 
   // scroll to bottom
   const msgEndRef = useRef<null | HTMLDivElement>(null);
@@ -164,7 +165,7 @@ export default function ChatBody({
     };
     const res = await sendMessage(newMessage).unwrap();
 
-    socket.emit('sendMessage', {
+    socket?.emit('sendMessage', {
       senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,
@@ -209,7 +210,7 @@ export default function ChatBody({
       senderId: res.data.senderId,
     };
 
-    socket.emit('sendMessage', {
+    socket?.emit('sendMessage', {
       senderName: userInfo?.username as string,
       senderId: userInfo?._id as string,
       receiverId: currentFriend?._id as string,

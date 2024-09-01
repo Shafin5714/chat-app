@@ -3,8 +3,7 @@ import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
 
 import { useRegisterMutation } from '../../store/apis/auth';
-import { useState, useEffect } from 'react';
-import { useAppSelector } from '@/store';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GetProp, UploadFile, UploadProps, notification } from 'antd';
 import ImgCrop from 'antd-img-crop';
@@ -19,6 +18,13 @@ type FieldType = {
   upload: UploadFile[];
 };
 
+type CustomError = {
+  status: number;
+  data: {
+    message: string;
+  };
+};
+
 export default function Register() {
   // hooks
   const navigate = useNavigate();
@@ -28,14 +34,7 @@ export default function Register() {
 
   // state
   const [file, setFile] = useState<File | null>(null);
-  const { userInfo } = useAppSelector((state) => state.auth);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-  useEffect(() => {
-    if (userInfo) {
-      navigate('/');
-    }
-  }, [navigate, userInfo]);
 
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
     console.log('Success:', values);
@@ -44,17 +43,21 @@ export default function Register() {
     formData.append('username', username ? username : '');
     formData.append('email', email ? email : '');
     formData.append('password', password ? password : '');
-
     formData.append('image', file as File);
 
-    const res = await registerUser(formData).unwrap();
-    console.log(res);
+    try {
+      const res = await registerUser(formData).unwrap();
 
-    if (res.status === 'success') {
-      notification.open({
-        message: res.message,
+      if (res.status === 'success') {
+        notification.open({
+          message: res.message,
+        });
+        navigate('/login');
+      }
+    } catch (error) {
+      notification.error({
+        message: (error as CustomError).data.message,
       });
-      navigate('/login');
     }
   };
 
