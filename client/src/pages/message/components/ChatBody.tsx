@@ -14,7 +14,7 @@ import {
   useGetMessageQuery,
   useSendMessageMutation,
   useSendImageMutation,
-} from '@/apis/messenger';
+} from '@/apis/message';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useRef } from 'react';
 import { FileImageOutlined } from '@ant-design/icons';

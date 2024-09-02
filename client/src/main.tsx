@@ -13,7 +13,7 @@ import {
 } from 'react-router-dom';
 import Login from '@/pages/login';
 import Register from '@/pages/register';
-import Messenger from '@/pages/messenger';
+import Message from '@/pages/message';
 import PrivateRoute from '@/components/PrivateRoute';
 import PublicRoute from '@/components/PublicRoute.tsx';
 import { AuthProvider, SocketProvider } from '@/contexts';
@@ -26,7 +26,7 @@ const router = createBrowserRouter(
         <Route path="/register" element={<Register />} />
       </Route>
       <Route element={<PrivateRoute />}>
-        <Route path="/" element={<Messenger />} />
+        <Route path="/" element={<Message />} />
       </Route>
     </Route>,
   ),

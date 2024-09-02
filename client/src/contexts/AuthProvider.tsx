@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { authSlice } from '@/slices';
-import messengerApi from '@/apis/messenger';
+import messageApi from '@/apis/message';
 import { useSocketContext } from '@/contexts';
 type Props = {
   children: ReactNode;
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: Props) {
   const logout = () => {
     socket?.disconnect();
     dispatch(authSlice.actions.logout());
-    dispatch(messengerApi.util.resetApiState());
+    dispatch(messageApi.util.resetApiState());
   };
 
   return (

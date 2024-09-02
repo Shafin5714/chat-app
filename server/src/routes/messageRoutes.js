@@ -6,7 +6,7 @@ import {
   sendMessage,
   getMessage,
   sendImage,
-} from '../controllers/messengerController.js';
+} from '../controllers/messageController.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { uploadSingleImage } from '../middlewares/fileUploadMiddleware.js';
 

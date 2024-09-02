@@ -13,7 +13,7 @@ type TFriend = {
   _id: string;
 };
 
-export default function Messenger() {
+export default function Message() {
   // hooks
   const { socket } = useSocketContext();
   // store
