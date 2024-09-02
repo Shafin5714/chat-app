@@ -10,7 +10,7 @@ import {
   Typography,
 } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
-import { useGetFriendsQuery } from '@/apis/messenger';
+import { useGetFriendsQuery } from '@/apis/message';
 import { LogoutOutlined } from '@ant-design/icons';
 import { useAppSelector } from '@/store';
 import { useNavigate } from 'react-router-dom';

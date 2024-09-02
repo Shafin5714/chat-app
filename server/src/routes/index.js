@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import userRoutes from './userRoutes.js';
-import messengerRoutes from './messengerRoutes.js';
+import messageRoutes from './messageRoutes.js';
 
 const router = Router();
 
@@ -9,6 +9,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/api/user', userRoutes);
-router.use('/api/messenger', messengerRoutes);
+router.use('/api/message', messageRoutes);
 
 export default router;

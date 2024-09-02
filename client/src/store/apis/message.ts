@@ -44,29 +44,29 @@ type SendImageResponse = {
   data: Message;
 };
 
-export const messengerApi = emptySplitApi.injectEndpoints({
+export const messageApi = emptySplitApi.injectEndpoints({
   endpoints: (builder) => ({
     getFriends: builder.query<FriendsResponse[], void>({
-      query: () => ({ url: '/messenger/friends' }),
+      query: () => ({ url: '/message/friends' }),
       providesTags: ['Friends'],
       transformResponse: (response: { data: FriendsResponse[] }) =>
         response.data,
     }),
     sendMessage: builder.mutation<SendMessageResponse, SendMessageRequest>({
       query: (data) => ({
-        url: '/messenger/send-message',
+        url: '/message/send-message',
         method: 'POST',
         body: data,
       }),
       invalidatesTags: ['Message', 'Friends'],
     }),
     getMessage: builder.query<GetMessagesResponse, string>({
-      query: (id) => ({ url: `/messenger/message/${id}` }),
+      query: (id) => ({ url: `/message/message/${id}` }),
       providesTags: ['Message'],
     }),
     sendImage: builder.mutation<SendImageResponse, FormData>({
       query: (data) => ({
-        url: '/messenger/send-image',
+        url: '/message/send-image',
         method: 'POST',
         body: data,
       }),
@@ -80,6 +80,6 @@ export const {
   useSendMessageMutation,
   useGetMessageQuery,
   useSendImageMutation,
-} = messengerApi;
+} = messageApi;
 
-export default messengerApi;
+export default messageApi;
