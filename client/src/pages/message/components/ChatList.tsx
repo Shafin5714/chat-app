@@ -25,12 +25,7 @@ type TFriend = {
 };
 
 type TFriends = {
-  friend: {
-    _id: string;
-    username: string;
-    email: string;
-    image: string;
-  };
+  friend: TFriend;
   lastMessage: {
     senderId: string;
     senderName: string;
@@ -40,7 +35,7 @@ type TFriends = {
       image: string;
     };
     createdAt: string;
-  };
+  } | null;
 };
 
 type Props = {
@@ -70,9 +65,12 @@ export default function ChatList({
   const { logout } = useAuthContext();
   const navigate = useNavigate();
 
+  const { socket } = useSocketContext();
+
   // state
   const { userInfo } = useAppSelector((state) => state.auth);
   const [friends, setFriends] = useState<TFriends[]>([]);
+  const [newUser, setNewUser] = useState<TFriend | null>(null);
   const { Search } = Input;
 
   const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
@@ -91,6 +89,25 @@ export default function ChatList({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
+  useEffect(() => {
+    socket?.on('newUser', (user) => {
+      setNewUser(user);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    const friend = friends.some(
+      (friend) => friend.friend.email === newUser?.email,
+    );
+
+    if (!friend && newUser) {
+      setFriends((prevState) => [
+        ...prevState,
+        { friend: newUser, lastMessage: null } as TFriends,
+      ]);
+    }
+  }, [newUser]);
 
   const activeStyle = {
     background: '#13c2c2',

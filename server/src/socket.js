@@ -30,6 +30,12 @@ const setUpSocket = (server) => {
     socket.on('addUser', (userId, userInfo) => {
       addUser(userId, socket.id, userInfo);
       io.emit('getUser', users);
+      socket.broadcast.emit('newUser', {
+        _id: userInfo._id,
+        email: userInfo.email,
+        image: userInfo.image,
+        username: userInfo.username,
+      });
     });
 
     socket.on('disconnect', () => {

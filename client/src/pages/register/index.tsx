@@ -1,7 +1,6 @@
 import { Button, Form, Input, Card, Upload, Flex } from 'antd';
 import type { FormProps } from 'antd';
 import AuthContainer from '@/components/AuthContainer';
-
 import { useRegisterMutation } from '../../store/apis/auth';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -52,6 +51,7 @@ export default function Register() {
         notification.open({
           message: res.message,
         });
+
         navigate('/login');
       }
     } catch (error) {
