@@ -71,6 +71,11 @@ export const getMessage = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const friendId = req.params.id;
 
+  const { page = 1 } = req.query;
+
+  const resultPerPage = 10;
+  const skip = (page - 1) * resultPerPage;
+
   const getMessages = await Message.find({
     $or: [
       {
@@ -86,7 +91,27 @@ export const getMessage = asyncHandler(async (req, res) => {
         ],
       },
     ],
-  });
+  })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(resultPerPage);
+
+  const total = await Message.find({
+    $or: [
+      {
+        $and: [
+          { senderId: { $eq: userId } },
+          { receiverId: { $eq: friendId } },
+        ],
+      },
+      {
+        $and: [
+          { senderId: { $eq: friendId } },
+          { receiverId: { $eq: userId } },
+        ],
+      },
+    ],
+  }).countDocuments();
 
   // const getMessages = (await Message.find({})).filter(
   //   (message) =>
@@ -98,7 +123,8 @@ export const getMessage = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    messages: getMessages,
+    messages: getMessages.reverse(),
+    total,
   });
 });
 

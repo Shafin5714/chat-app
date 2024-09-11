@@ -60,8 +60,13 @@ export const messageApi = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: ['Message', 'Friends'],
     }),
-    getMessage: builder.query<GetMessagesResponse, string>({
-      query: (id) => ({ url: `/message/message/${id}` }),
+    getMessage: builder.query<
+      GetMessagesResponse,
+      { id: string; page: number }
+    >({
+      query: ({ id, page }) => ({
+        url: `/message/message/${id as string}?page=${page}`,
+      }),
       providesTags: ['Message'],
     }),
     sendImage: builder.mutation<SendImageResponse, FormData>({

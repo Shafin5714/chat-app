@@ -8,8 +8,10 @@ import {
   Input,
   Button,
   notification,
+  Spin,
 } from 'antd';
 import { useEffect, useState } from 'react';
+import { useScroll } from 'react-use';
 import {
   useGetMessageQuery,
   useSendMessageMutation,
@@ -66,10 +68,10 @@ export default function ChatBody({
   const [sendMessage, { isLoading }] = useSendMessageMutation();
   const [sendImage, { isLoading: sendImageLoading }] = useSendImageMutation();
   const [socketMessage, setSocketMessage] = useState<Message | null>(null);
-  const { data } = useGetMessageQuery(
-    currentFriend?._id ? currentFriend?._id : skipToken,
-  );
+  const [messageLoaded, setMessageLoaded] = useState(false);
+
   const [messages, setMessages] = useState<Message[] | []>([]);
+  const [page, setPage] = useState<number>(1);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [socketTypingData, setSocketTypingData] = useState<{
     senderId: string;
@@ -79,9 +81,39 @@ export default function ChatBody({
     isTyping: false,
   });
 
+  const { data } = useGetMessageQuery(
+    currentFriend?._id
+      ? {
+          id: currentFriend?._id as string,
+          page,
+        }
+      : skipToken,
+  );
+
+  const scrollRef = useRef<null | HTMLDivElement>(null);
+  // scroll to bottom
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  const { x, y } = useScroll(scrollRef);
+
   useEffect(() => {
-    setMessages(data?.messages as Message[]);
+    if (data) {
+      setMessages((prevState) => [...data.messages, ...prevState]);
+    }
   }, [data]);
+
+  useEffect(() => {
+    if (scrollRef.current && !messageLoaded) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+    if (messages.length) {
+      setMessageLoaded(true);
+    }
+  }, [messages]);
+
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // }, [messages]);
 
   useEffect(() => {
     socket?.on('getMessage', (data) => {
@@ -136,16 +168,6 @@ export default function ChatBody({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, socket]);
-
-  // scroll to bottom
-  const msgEndRef = useRef<null | HTMLDivElement>(null);
-  const scrollToBottom = () => {
-    msgEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, message, socketTypingData]);
 
   useEffect(() => {
     if (messages?.length) {
@@ -225,6 +247,18 @@ export default function ChatBody({
     setMessage('');
   };
 
+  const fetchMoreData = () => {
+    setPage(page + 1);
+  };
+
+  useEffect(() => {
+    if (messages.length) {
+      if (y === 0) {
+        fetchMoreData();
+      }
+    }
+  }, [x, y]);
+
   return (
     <div style={{ paddingLeft: 10, paddingRight: 10 }}>
       <div
@@ -256,6 +290,7 @@ export default function ChatBody({
             overflowY: 'auto',
             height: `calc(100% - 100px)`,
           }}
+          ref={scrollRef}
         >
           <div style={{ padding: 10 }}>
             {messages?.length > 0
@@ -266,7 +301,6 @@ export default function ChatBody({
                       align="center"
                       key={index}
                       style={{ margin: '10px 0px' }}
-                      ref={msgEndRef}
                     >
                       <div
                         style={{
@@ -301,7 +335,6 @@ export default function ChatBody({
                                 border: '1px solid gray',
                                 borderRadius: 5,
                               }}
-                              ref={msgEndRef}
                             >
                               <img
                                 src={`http://localhost:5000${m.message.image}`}
@@ -325,7 +358,6 @@ export default function ChatBody({
                         margin: '10px 0px',
                       }}
                       key={index}
-                      ref={msgEndRef}
                     >
                       {m.message.text ? (
                         <>
@@ -349,7 +381,7 @@ export default function ChatBody({
                         </>
                       ) : (
                         <>
-                          <Flex ref={msgEndRef}>
+                          <Flex>
                             <div
                               style={{
                                 padding: 10,
@@ -375,12 +407,9 @@ export default function ChatBody({
                   ),
                 )
               : null}
+
             {isTyping ? (
-              <Flex
-                align="center"
-                style={{ margin: '10px 0px' }}
-                ref={msgEndRef}
-              >
+              <Flex align="center" style={{ margin: '10px 0px' }}>
                 <Typography.Text
                   italic
                   style={{
@@ -393,6 +422,8 @@ export default function ChatBody({
                 </Typography.Text>
               </Flex>
             ) : null}
+
+            <div ref={messagesEndRef} />
 
             {messages?.length === 0 && !isTyping ? (
               <Flex
